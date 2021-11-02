@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Clevis {
 
-    public Clevis(){
+    public Clevis(){            //Test comment message, hope you see this
         Scanner input = new Scanner(System.in);
         String sinput;
         String fregex = "([0-9]+[.][0-9]+|[0-9]+)";
