@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Clevis {
 
-    public Clevis(){
+    public Clevis(){            //Test comment message, hope you see this
         Scanner input = new Scanner(System.in);
         String sinput;
         String fregex = "([0-9]+[.][0-9]+|[0-9]+)";
@@ -16,6 +16,7 @@ public class Clevis {
             sinput = input.nextLine();
             if(sinput.matches("rectangle "+nregex+" "+fregex+" "+fregex+" "+fregex+" "+fregex)){
                 System.out.println("Rectangle command recognized");
+
             }
             else if(sinput.matches("line "+nregex+" "+fregex+" "+fregex+" "+fregex+" "+fregex)){
                 System.out.println("line command recognized");
@@ -61,6 +62,16 @@ public class Clevis {
                 System.out.println("Invalid command!");
             }
         }while(!sinput.equals("quit"));
+    }
+    public static void main(String[] args){     //my test case
+        Rectangle R = new Rectangle("A Rectangle", 0,0,10,20);
+        Line L = new Line("A Line",0,0,3,3);
+        Group G = new Group("A Group", R,L);
+        new Circle("A Circle",0,0,30);
+        new Square("A Sqaure",0,0,5);
+        Shape.ListTest();
+        Shape.delete("A Group");
+        Shape.ListTest();
     }
 
 }
