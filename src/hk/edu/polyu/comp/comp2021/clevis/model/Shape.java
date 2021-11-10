@@ -3,16 +3,25 @@ package hk.edu.polyu.comp.comp2021.clevis.model;
 import java.util.Objects;
 
 public class Shape {
+    /**                 Basic Settings              **/
     private final String name;
     Shape next;
     Shape previous;
+    Shape grouparent = null;
+
+    public static Shape cur=null;
+    public static Shape head= null;
 
     public Shape(String name) {
         // DON'T FORGET VALIDATION
         // Should we consider that names of shapes should not be duplicated
         // or its actually stated idk my brain is empty
-        this.name = name;
+        //whatever I'll leave the method here cuz I'm bored
 
+        this.name = name;
+        if (cur == null){
+            head = this;
+        }
         if(cur!=null){
             cur.next=this;
             this.previous=cur;
@@ -20,46 +29,78 @@ public class Shape {
         cur = this;
     }
 
+
+
     public String getName() {
         return name;
     }
 
     public void getInfo(){}
 
-    public static Shape cur=null;
+    public void move(double x, double y){}
 
-    public static Shape findAShape(String name){        //finds and returns the shape with a name
+
+
+    public static Shape findAShape(String name) {        //finds and returns the shape with a name
         Shape temp = cur;
-        while(!Objects.equals(temp.name, name)){
-            temp=temp.previous;
+        while (temp != null) {
+            if (temp.name.equals(name)) {
+                break;
+            }
+            temp = temp.previous;
+        }
+        if (temp == null) {
+            System.out.println("No shape with such name is found.");
         }
         return temp;
     }
 
-    public static void delete(String name){     //delete function prototype part 1
-        Shape target = findAShape(name);
-        target.delete();
+    public Shape belongToGroup(){
+        return grouparent;
     }
 
-    public void delete() {      //delete function prototype part 2
-        if (this.previous != null) {
-            this.previous.next = this.next;
+    /**-----------------[Delete related methods]------------------------------------------------------------**/
+
+    public static void delete(String name){     //delete function prototype part 1
+        Shape target = findAShape(name);
+        if(target == null) return;
+        else target.delete();
+    }
+
+    public void delete() {      //delete function prototype part 2 (v2)
+        if (this.previous == null && this.next != null) {
+            this.next.previous = null;
         }
-        if (this.next != null) {
+        else if (this.next == null && this.previous != null) {
+            cur= this.previous;
+        }
+        else if (this.previous != null && this.next != null){
             this.next.previous = this.previous;
         }
-        if (this == cur) {
+        else if (this.previous == null && this.next == null) {
             cur = null;
         }
     }
 
+    /**---------------[List related methods]------------------------------------------------------------**/
+
     public static void ListTest(){      //Lists every single shape, from the newest to the oldest
         Shape temp = cur;
         while(temp != null){
-            temp.getInfo();
+            if(temp.belongToGroup() == null) {
+                temp.getInfo();
+            }
             temp = temp.previous;
         }
     }
+    public static void ListFromHead(){   //might have to use this in redo steps, if you are having questions please ask Leo
+        Shape temp = head;
+        while (temp != null){
+            temp.getInfo();
+            temp = temp.next;
+        }
+    }
+
 }
 
 
@@ -67,9 +108,9 @@ public class Shape {
 
 
 class Rectangle extends Shape {
-    public float x, y, w, h;
+    public double x, y, w, h;
 
-    Rectangle(String name, float x, float y, float w, float h) {
+    Rectangle(String name, double x, double y, double w, double h) {
         super(name);
         this.x = x;
         this.y = y;
@@ -77,7 +118,11 @@ class Rectangle extends Shape {
         this.h = h;
     }
     public void getInfo(){
-        System.out.println(this.getName()+" x: "+ x + " y: "+y+" w: "+w+" h: "+h);
+        System.out.println("[Shape type: Rectangle] " + " [Shape name: "+this.getName()+"]  [x-coordinate: "+ x + "]  [y-coordinate: "+y+"]  [width: "+w+"]  [height: "+h+"]");
+    }
+    public void move(double x, double y){
+        this.x = this.x + x;
+        this.y = this.y + y;
     }
 }
 
@@ -86,9 +131,9 @@ class Rectangle extends Shape {
 
 
 class Line extends Shape {
-    public float x1, y1, x2, y2;
+    public double x1, y1, x2, y2;
 
-    Line(String name, float x1, float y1, float x2, float y2) {
+    Line(String name, double x1, double y1, double x2, double y2) {
         super(name);
         this.x1 = x1;
         this.x2 = x2;
@@ -96,7 +141,13 @@ class Line extends Shape {
         this.y2 = y2;
     }
     public void getInfo(){
-        System.out.println(this.getName()+" x1: "+ x1 + " y1: "+y1+" x2: "+x2+" y2: "+y2);
+        System.out.println("[Shape tpye: Line] "+ "]  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ x1 + "]  [y-coordinate 1: "+y1+"]  [x-coordinate 2: "+x2+"]  [y-coordinate 2: "+y2+"]");
+    }
+    public void move(double x, double y){
+        this.x1 = this.x1 + x;
+        this.x2 = this.x2 + x;
+        this.y1 = this.y1 + y;
+        this.y2 = this.y2 + y;
     }
 }
 
@@ -105,16 +156,20 @@ class Line extends Shape {
 
 
 class Circle extends Shape {
-    public float x, y, r;
+    public double x, y, r;
 
-    Circle(String name, float x, float y, float r) {
+    Circle(String name, double x, double y, double r) {
         super(name);
         this.x = x;
         this.y = y;
         this.r = r;
     }
     public void getInfo(){
-        System.out.println(this.getName()+" x: "+ x + " y: "+y+" r: "+r);
+        System.out.println("[Shape type: Circle] "+ " [Shape name: "+this.getName()+"]  [x-coordinate: "+ x + "]  [y-coordinate: "+y+"]  [radius: "+r+"]");
+    }
+    public void move(double x, double y){
+        this.x = this.x + x;
+        this.y = this.y + y;
     }
 }
 
@@ -123,47 +178,61 @@ class Circle extends Shape {
 
 
 class Square extends Shape {
-    public float x, y, l;
+    public double x, y, l;
 
-    Square(String name, float x, float y, float l) {
+    Square(String name, double x, double y, double l) {
         super(name);
         this.x = x;
         this.y = y;
         this.l = l;
     }
     public void getInfo(){
-        System.out.println(this.getName()+" x: "+ x + " y: "+y+" l: "+l);
+        System.out.println("[Shape type: Square] "+" [Shape name: "+this.getName()+"]  [x-coordinate: "+ x + "]  [y-coordinate: "+y+"]  [side length: "+l+"]");
+    }
+    public void move(double x, double y){
+        this.x = this.x + x;
+        this.y = this.y + y;
     }
 }
 
 //==================[GROUP CLASS]=====================================================================
 
-class Group extends Shape{
-    public Shape s1, s2 ;
-    Group(String name, Shape s1, Shape s2){
+class Group extends Shape {
+    public Shape s1, s2;
+
+    Group(String name, Shape s1, Shape s2) {
         super(name);
-        this.s1=s1;
-        this.s2=s2;
+        this.s1 = s1;
+        this.s2 = s2;
+        this.s1.grouparent = this;
+        this.s2.grouparent = this;
     }
-    public void getInfo(){
-        System.out.println("Group name: "+ this.getName());
+
+    public void getInfo() {
+        System.out.println("[Type: Group] " + " [Group name: " + this.getName()+"]");
+        System.out.print("\t");
         s1.getInfo();
+        System.out.print("\t");
         s2.getInfo();
     }
-    public void delete(){
+
+    public void delete() {
         s1.delete();
         s2.delete();
-        s1=null;
-        s2=null;
-        if (this.previous != null) {
-            this.previous.next = this.next;
-        }
-        if (this.next != null) {
+        if (this.previous == null && this.next != null) {
+            this.next.previous = null;
+        } else if (this.next == null && this.previous != null) {
+            cur = this.previous;
+        } else if (this.previous != null && this.previous != null) {
             this.next.previous = this.previous;
-        }
-        if (this == cur) {
+        } else if (this.previous == null && this.next == null) {
             cur = null;
         }
+    }
+
+    public void move(double x, double y) {
+        s1.move(x, y);
+        s2.move(x, y);
     }
 }
 
