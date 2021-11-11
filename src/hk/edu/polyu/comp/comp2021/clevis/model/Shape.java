@@ -1,7 +1,5 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
-import java.util.Objects;
-
 public class Shape {
     /**                 Basic Settings              **/
     private final String name;
@@ -39,7 +37,7 @@ public class Shape {
 
     public void move(double x, double y){}
 
-
+    public void ungroup(){}
 
     public static Shape findAShape(String name) {        //finds and returns the shape with a name
         Shape temp = cur;
@@ -63,22 +61,21 @@ public class Shape {
 
     public static void delete(String name){     //delete function prototype part 1
         Shape target = findAShape(name);
-        if(target == null) return;
-        else target.delete();
+        if(target != null) target.delete();
     }
 
     public void delete() {      //delete function prototype part 2 (v2)
         if (this.previous == null && this.next != null) {
             this.next.previous = null;
-        }
-        else if (this.next == null && this.previous != null) {
-            cur= this.previous;
-        }
-        else if (this.previous != null && this.next != null){
+        } else if (this.next == null && this.previous != null) {
+            cur = this.previous;
+        } else if (this.previous != null) {
             this.next.previous = this.previous;
-        }
-        else if (this.previous == null && this.next == null) {
+        } else {
             cur = null;
+        }
+        if(cur == this){
+            cur = this.previous;
         }
     }
 
@@ -118,7 +115,7 @@ class Rectangle extends Shape {
         this.h = h;
     }
     public void getInfo(){
-        System.out.println("[Shape type: Rectangle] " + " [Shape name: "+this.getName()+"]  [x-coordinate: "+ x + "]  [y-coordinate: "+y+"]  [width: "+w+"]  [height: "+h+"]");
+        System.out.println("[Shape type: Rectangle] " + " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [width: "+String.format("%.2f",w)+"]  [height: "+String.format("%.2f",h)+"]");
     }
     public void move(double x, double y){
         this.x = this.x + x;
@@ -141,7 +138,7 @@ class Line extends Shape {
         this.y2 = y2;
     }
     public void getInfo(){
-        System.out.println("[Shape tpye: Line] "+ "]  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ x1 + "]  [y-coordinate 1: "+y1+"]  [x-coordinate 2: "+x2+"]  [y-coordinate 2: "+y2+"]");
+        System.out.println("[Shape tpye: Line] "+ "]  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
     }
     public void move(double x, double y){
         this.x1 = this.x1 + x;
@@ -165,7 +162,7 @@ class Circle extends Shape {
         this.r = r;
     }
     public void getInfo(){
-        System.out.println("[Shape type: Circle] "+ " [Shape name: "+this.getName()+"]  [x-coordinate: "+ x + "]  [y-coordinate: "+y+"]  [radius: "+r+"]");
+        System.out.println("[Shape type: Circle] "+ " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [radius: "+String.format("%.2f",r)+"]");
     }
     public void move(double x, double y){
         this.x = this.x + x;
@@ -187,7 +184,7 @@ class Square extends Shape {
         this.l = l;
     }
     public void getInfo(){
-        System.out.println("[Shape type: Square] "+" [Shape name: "+this.getName()+"]  [x-coordinate: "+ x + "]  [y-coordinate: "+y+"]  [side length: "+l+"]");
+        System.out.println("[Shape type: Square] "+" [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [side length: "+String.format("%.2f",l)+"]");
     }
     public void move(double x, double y){
         this.x = this.x + x;
@@ -210,6 +207,7 @@ class Group extends Shape {
 
     public void getInfo() {
         System.out.println("[Type: Group] " + " [Group name: " + this.getName()+"]");
+        System.out.println("previous: "+ this.previous + " next: "+ this.next + " GP: "+ this.grouparent);
         System.out.print("\t");
         s1.getInfo();
         System.out.print("\t");
@@ -219,20 +217,33 @@ class Group extends Shape {
     public void delete() {
         s1.delete();
         s2.delete();
-        if (this.previous == null && this.next != null) {
-            this.next.previous = null;
-        } else if (this.next == null && this.previous != null) {
-            cur = this.previous;
-        } else if (this.previous != null && this.previous != null) {
-            this.next.previous = this.previous;
-        } else if (this.previous == null && this.next == null) {
-            cur = null;
-        }
+        gdelete();
     }
 
     public void move(double x, double y) {
         s1.move(x, y);
         s2.move(x, y);
+    }
+
+    public void ungroup(){
+        s1.grouparent = null;
+        s2.grouparent = null;
+        gdelete();
+    }
+
+    private void gdelete(){
+        if (this.previous == null && this.next != null) {
+            this.next.previous = null;
+        } else if (this.next == null && this.previous != null) {
+            cur = this.previous;
+        } else if (this.previous != null) {
+            this.next.previous = this.previous;
+        } else {
+            cur = null;
+        }
+        if(cur == this){
+            cur = this.previous;
+        }
     }
 }
 
