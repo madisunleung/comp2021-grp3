@@ -1,7 +1,5 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
-import java.util.Objects;
-
 public class Shape {
     /**                 Basic Settings              **/
     private final String name;
@@ -63,8 +61,7 @@ public class Shape {
 
     public static void delete(String name){     //delete function prototype part 1
         Shape target = findAShape(name);
-        if(target == null) return;
-        else target.delete();
+        if(target != null) target.delete();
     }
 
     public void delete() {      //delete function prototype part 2 (v2)
@@ -72,9 +69,9 @@ public class Shape {
             this.next.previous = null;
         } else if (this.next == null && this.previous != null) {
             cur = this.previous;
-        } else if (this.previous != null && this.previous != null) {
+        } else if (this.previous != null) {
             this.next.previous = this.previous;
-        } else if (this.previous == null && this.next == null) {
+        } else {
             cur = null;
         }
         if(cur == this){
@@ -239,9 +236,9 @@ class Group extends Shape {
             this.next.previous = null;
         } else if (this.next == null && this.previous != null) {
             cur = this.previous;
-        } else if (this.previous != null && this.previous != null) {
+        } else if (this.previous != null) {
             this.next.previous = this.previous;
-        } else if (this.previous == null && this.next == null) {
+        } else {
             cur = null;
         }
         if(cur == this){
