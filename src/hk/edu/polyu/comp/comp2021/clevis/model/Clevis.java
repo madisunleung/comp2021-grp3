@@ -14,6 +14,7 @@ public class Clevis {
         do{
             System.out.print("Please enter your command: ");
             sinput = input.nextLine();
+            sinput= sinput.trim();
             if(sinput.matches("rectangle "+nregex+" "+fregex+" "+fregex+" "+fregex+" "+fregex)) {        //Rectangle construct, basically complete
                 System.out.println("Rectangle command recognized");
                 String[] cmd = sinput.split(" ");
