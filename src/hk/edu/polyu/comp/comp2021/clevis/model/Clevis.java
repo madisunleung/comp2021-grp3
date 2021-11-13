@@ -37,10 +37,20 @@ public class Clevis {
             else if(sinput.matches("group "+nregex+" "+nregex+" "+nregex)){                             //Group construct, basically complete
                 System.out.println("group command recognized");
                 String[] cmd = sinput.split(" ");
-                new Group(cmd[1],Shape.findAShape(cmd[2]),Shape.findAShape(cmd[3]));
+                Shape a = Shape.findAShape(cmd[2]);
+                Shape b = Shape.findAShape(cmd[3]);
+                if(a != null && b != null) {
+                    new Group(cmd[1],a,b);
+                }
             }
-            else if(sinput.matches("ungroup "+nregex)){
+            else if(sinput.matches("ungroup "+nregex)){                                                 //Ungroup action, basically complete
                 System.out.println("ungroup command recognized");
+                String[] cmd = sinput.split(" ");
+                Shape temp = Shape.findAShape(cmd[1]);
+                if (!(temp instanceof Group)&& temp != null){
+                    System.out.println("This is not a group.");
+                }
+                else if(temp != null) temp.ungroup();
             }
             else if(sinput.matches("delete "+nregex)){                                                  //Delete on a certain shape, I have questions for this
                 System.out.println("delete command recognized");
@@ -50,7 +60,7 @@ public class Clevis {
             else if(sinput.matches("boundingbox "+nregex)){
                 System.out.println("boundingbox command recognized");
             }
-            else if(sinput.matches("move "+nregex+" "+fregex+" "+fregex)){
+            else if(sinput.matches("move "+nregex+" "+fregex+" "+fregex)){                             //Move a shape, basically complete
                 System.out.println("move command recognized");
                 String[] cmd = sinput.split(" ");
                Shape temp =  Shape.findAShape(cmd[1]);
@@ -79,6 +89,10 @@ public class Clevis {
             else if(sinput.equals("quit")){                                                             //Quit the CLI, no need to check this right?
                 System.out.println("Quitting...");
                 break;
+            }
+            else if(sinput.equals("listHead")){
+                System.out.println("listHead test");
+                Shape.ListFromHead();
             }
             else{                                                                                       //Happens when the command is not recognized
                 System.out.println("Invalid command!");
