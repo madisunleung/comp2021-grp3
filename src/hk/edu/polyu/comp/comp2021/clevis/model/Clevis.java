@@ -14,25 +14,33 @@ public class Clevis {
         do{
             System.out.print("Please enter your command: ");
             sinput = input.nextLine();
-            if(sinput.matches("rectangle "+nregex+" "+fregex+" "+fregex+" "+fregex+" "+fregex)){        //Rectangle construct, basically complete
+            if(sinput.matches("rectangle "+nregex+" "+fregex+" "+fregex+" "+fregex+" "+fregex)) {        //Rectangle construct, basically complete
                 System.out.println("Rectangle command recognized");
                 String[] cmd = sinput.split(" ");
-                new Rectangle(cmd[1],Double.parseDouble(cmd[2]),Double.parseDouble(cmd[3]),Double.parseDouble(cmd[4]),Double.parseDouble(cmd[5]));
+                if (nameNotUsed(cmd[1])) {
+                    new Rectangle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5]));
+                }
             }
             else if(sinput.matches("line "+nregex+" "+fregex+" "+fregex+" "+fregex+" "+fregex)){        //Line construct, basically complete
                 System.out.println("line command recognized");
                 String[] cmd = sinput.split(" ");
-                new Line(cmd[1],Double.parseDouble(cmd[2]),Double.parseDouble(cmd[3]),Double.parseDouble(cmd[4]),Double.parseDouble(cmd[5]));
+                if (nameNotUsed(cmd[1])) {
+                    new Line(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5]));
+                }
             }
             else if(sinput.matches("circle "+nregex+" "+fregex+" "+fregex+" "+fregex)){                 //Circle construct, basically complete
                 System.out.println("circle command recognized");
                 String[] cmd = sinput.split(" ");
-                new Circle(cmd[1],Double.parseDouble(cmd[2]),Double.parseDouble(cmd[3]),Double.parseDouble(cmd[4]));
+                if (nameNotUsed(cmd[1])) {
+                    new Circle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]));
+                }
             }
             else if(sinput.matches("square "+nregex+" "+fregex+" "+fregex+" "+fregex)){                 //Square construct, basically complete
                 System.out.println("square command recognized");
                 String[] cmd = sinput.split(" ");
-                new Square(cmd[1],Double.parseDouble(cmd[2]),Double.parseDouble(cmd[3]),Double.parseDouble(cmd[4]));
+                if (nameNotUsed(cmd[1])) {
+                    new Square(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]));
+                }
             }
             else if(sinput.matches("group "+nregex+" "+nregex+" "+nregex)){                             //Group construct, basically complete
                 System.out.println("group command recognized");
@@ -79,7 +87,10 @@ public class Clevis {
                 String[] cmd = sinput.split(" ");
                 Shape temp = Shape.findAShape(cmd[1]);
                 if(temp != null){
-                    temp.getInfo();
+                    temp.getInfo(1);
+                }
+                else{
+                    System.out.println("No shape with such name is found.");
                 }
             }
             else if(sinput.equals("listAll")){                                                           //List all the shape, basically complete, but I have questions too
@@ -98,6 +109,16 @@ public class Clevis {
                 System.out.println("Invalid command!");
             }
         }while(!sinput.equals("quit"));
+    }
+
+    public boolean nameNotUsed(String name){                  //method called when constructing new shapes, checks if the name is used or not
+        if(Shape.findAShape(name)==null){
+            return true;
+        }
+        else{
+            System.out.println("The name ["+name+"] is already used for a shape.");
+            return false;
+        }
     }
 
     public static void main(String[] args){     //my test case
