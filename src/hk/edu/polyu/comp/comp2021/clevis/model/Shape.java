@@ -13,8 +13,7 @@ public class Shape {
     public Shape(String name) {
         // DON'T FORGET VALIDATION
         // Should we consider that names of shapes should not be duplicated
-        // or its actually stated idk my brain is empty
-        //whatever I'll leave the method here cuz I'm bored
+        // Already implemented to check duplicated existing names of shapes, in Clevis.java using a boolean function nameNotUsed()
 
         this.name = name;
         if (cur == null){
@@ -33,7 +32,7 @@ public class Shape {
         return name;
     }
 
-    public void getInfo(){}
+    public void getInfo(int n){}
 
     public void move(double x, double y){}
 
@@ -47,9 +46,6 @@ public class Shape {
             }
             temp = temp.previous;
         }
-        if (temp == null) {
-            System.out.println("No shape with such name is found.");
-        }
         return temp;
     }
 
@@ -61,7 +57,14 @@ public class Shape {
 
     public static void delete(String name){     //delete function prototype part 1
         Shape target = findAShape(name);
-        if(target != null) target.delete();
+        if(target != null) {
+            if(target.grouparent == null) {
+                target.delete();
+            }
+            else{
+                System.out.println("Deleting a component shape of a group is invalid!");
+            }
+        }
     }
 
     public void delete() {      //delete function prototype part 2 (v2)
@@ -85,7 +88,7 @@ public class Shape {
         Shape temp = cur;
         while(temp != null){
             if(temp.belongToGroup() == null) {
-                temp.getInfo();
+                temp.getInfo(1);
             }
             temp = temp.previous;
         }
@@ -93,7 +96,7 @@ public class Shape {
     public static void ListFromHead(){   //might have to use this in redo steps, if you are having questions please ask Leo
         Shape temp = head;
         while (temp != null){
-            temp.getInfo();
+            temp.getInfo(1);
             temp = temp.next;
         }
     }
@@ -114,7 +117,7 @@ class Rectangle extends Shape {
         this.w = w;
         this.h = h;
     }
-    public void getInfo(){
+    public void getInfo(int n){
         System.out.println("[Shape type: Rectangle] " + " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [width: "+String.format("%.2f",w)+"]  [height: "+String.format("%.2f",h)+"]");
     }
     public void move(double x, double y){
@@ -137,7 +140,7 @@ class Line extends Shape {
         this.y1 = y1;
         this.y2 = y2;
     }
-    public void getInfo(){
+    public void getInfo(int n){
         System.out.println("[Shape tpye: Line] "+ "]  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
     }
     public void move(double x, double y){
@@ -161,7 +164,7 @@ class Circle extends Shape {
         this.y = y;
         this.r = r;
     }
-    public void getInfo(){
+    public void getInfo(int n){
         System.out.println("[Shape type: Circle] "+ " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [radius: "+String.format("%.2f",r)+"]");
     }
     public void move(double x, double y){
@@ -183,7 +186,7 @@ class Square extends Shape {
         this.y = y;
         this.l = l;
     }
-    public void getInfo(){
+    public void getInfo(int n){
         System.out.println("[Shape type: Square] "+" [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [side length: "+String.format("%.2f",l)+"]");
     }
     public void move(double x, double y){
@@ -205,21 +208,29 @@ class Group extends Shape {
         this.s2.grouparent = this;
     }
 
-    public void getInfo() {
+    public void getInfo(int n) {
         System.out.println("[Type: Group] " + " [Group name: " + this.getName()+"]");
-        System.out.println("previous: "+ this.previous + " next: "+ this.next + " GP: "+ this.grouparent);
-        System.out.print("\t");
-        s1.getInfo();
-        System.out.print("\t");
-        s2.getInfo();
+        //System.out.println("previous: "+ this.previous + " next: "+ this.next + " GP: "+ this.grouparent);
+        for(int i = 0; i<n ; i++) {
+            System.out.print("\t");
+        }
+        s1.getInfo(n+1);
+        for(int i = 0; i<n ; i++) {
+            System.out.print("\t");
+        }
+        s2.getInfo(n+1);
     }
 
     public void delete() {
-        s1.delete();
-        s2.delete();
-        gdelete();
+        if (this.grouparent == null) {
+            s1.delete();
+            s2.delete();
+            gdelete();
+        }
+        else{
+            System.out.println("Deleting a component shape of a group is invalid!");
+        }
     }
-
     public void move(double x, double y) {
         s1.move(x, y);
         s2.move(x, y);
