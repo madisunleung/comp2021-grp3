@@ -168,7 +168,7 @@ class Line extends Shape {
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x1 < this.x2 ? this.x1 : this.x2; //smaller x
-        boxArr[1] = this.y1 < this.y2 ? this.y1 : this.y2; //smaller y
+        boxArr[1] = this.y1 > this.y2 ? this.y1 : this.y2; //bigger y
         boxArr[2] = this.x1 < this.x2 ? this.x2 - this.x1 : this.x1 - this.x2; // width = larger x - smaller x
         boxArr[3] = this.y1 < this.y2 ? this.y2 - this.y1 : this.y1 - this.y2; // height = larger y - smaller x
 
@@ -272,18 +272,41 @@ class Group extends Shape {
         double[] result = new double[4];
         if(s1boxArr[0]<s2boxArr[0]){
             result[0]=s1boxArr[0];
+            if(s1boxArr[0]+s1boxArr[2]>s2boxArr[0]+s2boxArr[2]){
+                result[2]=s1boxArr[2];
+            }
+            else{
+                result[2]=s2boxArr[0]-s1boxArr[0]+s2boxArr[2];
+            }
         }
         else{
             result[0]=s2boxArr[0];
-        }
-        for(int i = 1; i<4; i++){
-            if(s1boxArr[i]<s2boxArr[i]){
-                result[i]=s1boxArr[i];
+            if(s2boxArr[0]+s2boxArr[2]>s1boxArr[0]+s1boxArr[2]){
+                result[2]=s2boxArr[2];
             }
             else{
-                result[i]=s2boxArr[i];
+                result[2]=s1boxArr[0]-s2boxArr[0]+s1boxArr[2];
             }
         }
+        if(s1boxArr[1]>s2boxArr[1]){
+            result[1]=s1boxArr[1];
+            if(s1boxArr[1]-s1boxArr[3]<s2boxArr[1]-s2boxArr[3]){
+                result[3]=s1boxArr[3];
+            }
+            else{
+                result[3]=s1boxArr[1]-s2boxArr[1]+s2boxArr[3];
+            }
+        }
+        else{
+            result[1] = s2boxArr[1];
+            if(s2boxArr[1]-s2boxArr[3]<s1boxArr[1]-s1boxArr[3]){
+                result[3]=s2boxArr[3];
+            }
+            else{
+                result[3]=s2boxArr[1]-s1boxArr[1]+s1boxArr[3];
+            }
+        }
+
         return result;
     }
 
