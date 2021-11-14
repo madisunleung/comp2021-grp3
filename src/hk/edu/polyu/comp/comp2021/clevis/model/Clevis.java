@@ -68,6 +68,14 @@ public class Clevis {
             }
             else if(sinput.matches("boundingbox "+nregex)){
                 System.out.println("boundingbox command recognized");
+                String[] cmd = sinput.split(" ");
+                Shape temp = Shape.findAShape(cmd[1]);
+                if(temp != null) {
+                    double[] result =temp.boundingbox();
+                    System.out.println("Bounding box of "+cmd[1]+" is: x: "+String.format("%.2f",result[0])+" y: "+String.format("%.2f",result[1])+" w: "+String.format("%.2f",result[2])+" h: "+String.format("%.2f",result[3]));
+                } else{
+                    System.out.println("No shape with such name is found.");
+                }
             }
             else if(sinput.matches("move "+nregex+" "+fregex+" "+fregex)){                             //Move a shape, basically complete
                 System.out.println("move command recognized");

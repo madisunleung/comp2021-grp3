@@ -1,5 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
+import java.util.Arrays;
+
 public class Shape {
     /**                 Basic Settings              **/
     private final String name;
@@ -26,8 +28,6 @@ public class Shape {
         cur = this;
     }
 
-
-
     public String getName() {
         return name;
     }
@@ -35,6 +35,10 @@ public class Shape {
     public void getInfo(int n){}
 
     public void move(double x, double y){}
+
+    public double[] boundingbox(){
+        return new double[4];
+    }
 
     public void ungroup(){}
 
@@ -124,6 +128,16 @@ class Rectangle extends Shape {
         this.x = this.x + x;
         this.y = this.y + y;
     }
+
+    public double[] boundingbox() {
+        double[] boxArr = new double[4];
+        boxArr[0] = this.x;
+        boxArr[1] = this.y;
+        boxArr[2] = this.w;
+        boxArr[3] = this.h;
+
+        return boxArr;
+    }
 }
 
 
@@ -143,11 +157,22 @@ class Line extends Shape {
     public void getInfo(int n){
         System.out.println("[Shape tpye: Line] "+ "]  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
     }
+
     public void move(double x, double y){
         this.x1 = this.x1 + x;
         this.x2 = this.x2 + x;
         this.y1 = this.y1 + y;
         this.y2 = this.y2 + y;
+    }
+
+    public double[] boundingbox() {
+        double[] boxArr = new double[4];
+        boxArr[0] = this.x1 < this.x2 ? this.x1 : this.x2; //smaller x
+        boxArr[1] = this.y1 < this.y2 ? this.y1 : this.y2; //smaller y
+        boxArr[2] = this.x1 < this.x2 ? this.x2 - this.x1 : this.x1 - this.x2; // width = larger x - smaller x
+        boxArr[3] = this.y1 < this.y2 ? this.y2 - this.y1 : this.y1 - this.y2; // height = larger y - smaller x
+
+        return boxArr;
     }
 }
 
@@ -171,6 +196,16 @@ class Circle extends Shape {
         this.x = this.x + x;
         this.y = this.y + y;
     }
+
+    public double[] boundingbox() {
+        double[] boxArr = new double[4];
+        boxArr[0] = this.x - this.r; //upper left corner x
+        boxArr[1] = this.y + this.r; //upper left corner y
+        boxArr[2] = this.r * 2;  //width
+        boxArr[3] = this.r * 2; // height
+
+        return boxArr;
+    }
 }
 
 
@@ -193,6 +228,16 @@ class Square extends Shape {
         this.x = this.x + x;
         this.y = this.y + y;
     }
+
+    public double[] boundingbox() {
+        double[] boxArr = new double[4];
+        boxArr[0] = this.x;
+        boxArr[1] = this.y;
+        boxArr[2] = this.l;
+        boxArr[3] = this.l;
+
+        return boxArr;
+    }
 }
 
 //==================[GROUP CLASS]=====================================================================
@@ -209,16 +254,37 @@ class Group extends Shape {
     }
 
     public void getInfo(int n) {
-        System.out.println("[Type: Group] " + " [Group name: " + this.getName()+"]");
+        System.out.println("[Type: Group] " + " [Group name: " + this.getName() + "]");
         //System.out.println("previous: "+ this.previous + " next: "+ this.next + " GP: "+ this.grouparent);
-        for(int i = 0; i<n ; i++) {
+        for (int i = 0; i < n; i++) {
             System.out.print("\t");
         }
-        s1.getInfo(n+1);
-        for(int i = 0; i<n ; i++) {
+        s1.getInfo(n + 1);
+        for (int i = 0; i < n; i++) {
             System.out.print("\t");
         }
-        s2.getInfo(n+1);
+        s2.getInfo(n + 1);
+    }
+
+    public double[] boundingbox() {
+        double[] s1boxArr = s1.boundingbox();
+        double[] s2boxArr = s2.boundingbox();
+        double[] result = new double[4];
+        if(s1boxArr[0]<s2boxArr[0]){
+            result[0]=s1boxArr[0];
+        }
+        else{
+            result[0]=s2boxArr[0];
+        }
+        for(int i = 1; i<4; i++){
+            if(s1boxArr[i]<s2boxArr[i]){
+                result[i]=s1boxArr[i];
+            }
+            else{
+                result[i]=s2boxArr[i];
+            }
+        }
+        return result;
     }
 
     public void delete() {
@@ -226,23 +292,23 @@ class Group extends Shape {
             s1.delete();
             s2.delete();
             gdelete();
-        }
-        else{
+        } else {
             System.out.println("Deleting a component shape of a group is invalid!");
         }
     }
+
     public void move(double x, double y) {
         s1.move(x, y);
         s2.move(x, y);
     }
 
-    public void ungroup(){
+    public void ungroup() {
         s1.grouparent = null;
         s2.grouparent = null;
         gdelete();
     }
 
-    private void gdelete(){
+    private void gdelete() {
         if (this.previous == null && this.next != null) {
             this.next.previous = null;
         } else if (this.next == null && this.previous != null) {
@@ -252,9 +318,9 @@ class Group extends Shape {
         } else {
             cur = null;
         }
-        if(cur == this){
+        if (cur == this) {
             cur = this.previous;
         }
     }
-}
 
+}
