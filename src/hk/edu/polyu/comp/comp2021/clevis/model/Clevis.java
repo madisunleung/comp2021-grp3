@@ -61,28 +61,35 @@ public class Clevis {
                 }
                 else if(temp != null) temp.ungroup();
             }
-            else if(sinput.matches("delete "+nregex)){                                                  //Delete on a certain shape, I have questions for this
+            else if(sinput.matches("delete "+nregex)){                                                  //Delete on a certain shape, basically complete
                 System.out.println("delete command recognized");
                 String[] cmd = sinput.split(" ");
                 Shape.delete(cmd[1]);
             }
-            else if(sinput.matches("boundingbox "+nregex)){
+            else if(sinput.matches("boundingbox "+nregex)){                                             //Bounding box, basically complete
                 System.out.println("boundingbox command recognized");
                 String[] cmd = sinput.split(" ");
                 Shape temp = Shape.findAShape(cmd[1]);
-                if(temp != null) {
+                if(temp != null && temp.grouparent == null) {
                     double[] result =temp.boundingbox();
                     System.out.println("Bounding box of "+cmd[1]+" is: x: "+String.format("%.2f",result[0])+" y: "+String.format("%.2f",result[1])+" w: "+String.format("%.2f",result[2])+" h: "+String.format("%.2f",result[3]));
-                } else{
+                } else if(temp == null){
                     System.out.println("No shape with such name is found.");
+                }else {
+                    System.out.println("Cannot perform action on group component!");
                 }
             }
             else if(sinput.matches("move "+nregex+" "+fregex+" "+fregex)){                             //Move a shape, basically complete
                 System.out.println("move command recognized");
                 String[] cmd = sinput.split(" ");
                Shape temp =  Shape.findAShape(cmd[1]);
-               if(temp != null){
+               if(temp != null && temp.grouparent == null){
                    temp.move(Double.parseDouble(cmd[2]),Double.parseDouble(cmd[3]));
+               }
+               else if(temp == null){
+                   System.out.println("No shape with such name is found.");
+               }else {
+                   System.out.println("Cannot perform action on group component!");
                }
             }
             else if(sinput.matches("pick-and-move "+fregex+" "+fregex+" "+fregex+" "+fregex)){
@@ -95,14 +102,17 @@ public class Clevis {
                 System.out.println("list command recognized");
                 String[] cmd = sinput.split(" ");
                 Shape temp = Shape.findAShape(cmd[1]);
-                if(temp != null){
+                if(temp != null && temp.grouparent == null){
                     temp.getInfo(1);
                 }
-                else{
+                else if(temp == null){
                     System.out.println("No shape with such name is found.");
                 }
+                else {
+                    System.out.println("Cannot perform action on group component!");
+                }
             }
-            else if(sinput.equals("listAll")){                                                           //List all the shape, basically complete, but I have questions too
+            else if(sinput.equals("listAll")){                                                           //List all the shape, basically complete
                 System.out.println("listAll command recognized");
                 Shape.ListTest();
             }
@@ -119,6 +129,7 @@ public class Clevis {
             }
         }while(!sinput.equals("quit"));
     }
+
 
     public boolean nameNotUsed(String name){                  //method called when constructing new shapes, checks if the name is used or not
         if(Shape.findAShape(name)==null){
