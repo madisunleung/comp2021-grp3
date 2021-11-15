@@ -19,28 +19,28 @@ public class Clevis {
                 System.out.println("Rectangle command recognized");
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
-                    new Rectangle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5]));
+                    Shape.addShape(new Rectangle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5])));
                 }
             }
             else if(sinput.matches("line "+nregex+" "+fregex+" "+fregex+" "+fregex+" "+fregex)){        //Line construct, basically complete
                 System.out.println("line command recognized");
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
-                    new Line(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5]));
+                    Shape.addShape(new Line(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5])));
                 }
             }
             else if(sinput.matches("circle "+nregex+" "+fregex+" "+fregex+" "+fregex)){                 //Circle construct, basically complete
                 System.out.println("circle command recognized");
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
-                    new Circle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]));
+                    Shape.addShape(new Circle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4])));
                 }
             }
             else if(sinput.matches("square "+nregex+" "+fregex+" "+fregex+" "+fregex)){                 //Square construct, basically complete
                 System.out.println("square command recognized");
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
-                    new Square(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]));
+                    Shape.addShape(new Square(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4])));
                 }
             }
             else if(sinput.matches("group "+nregex+" "+nregex+" "+nregex)){                             //Group construct, basically complete
@@ -49,7 +49,7 @@ public class Clevis {
                 Shape a = Shape.findAShape(cmd[2]);
                 Shape b = Shape.findAShape(cmd[3]);
                 if(a != null && b != null) {
-                    new Group(cmd[1],a,b);
+                    Shape.addShape(new Group(cmd[1],a,b));
                 }
             }
             else if(sinput.matches("ungroup "+nregex)){                                                 //Ungroup action, basically complete

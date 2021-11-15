@@ -18,14 +18,17 @@ public class Shape {
         // Already implemented to check duplicated existing names of shapes, in Clevis.java using a boolean function nameNotUsed()
 
         this.name = name;
+    }
+
+    public static void addShape(Shape a){
         if (cur == null){
-            head = this;
+            head = a;
         }
         if(cur!=null){
-            cur.next=this;
-            this.previous=cur;
+            cur.next=a;
+            a.previous=cur;
         }
-        cur = this;
+        cur = a;
     }
 
     public String getName() {
@@ -155,7 +158,7 @@ class Line extends Shape {
         this.y2 = y2;
     }
     public void getInfo(int n){
-        System.out.println("[Shape tpye: Line] "+ "]  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
+        System.out.println("[Shape tpye: Line] "+ "  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
     }
 
     public void move(double x, double y){
