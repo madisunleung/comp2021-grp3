@@ -1,5 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
+import org.w3c.dom.css.Rect;
+
 import java.util.Arrays;
 
 public class Shape {
@@ -59,7 +61,23 @@ public class Shape {
     public Shape belongToGroup(){
         return grouparent;
     }
+    /**-----------------[Intersect related methods]------------------------------------------------------------**/
+    /* public static boolean intersect(Shape n1, Shape n2){
+        Shape[] temp1 = new subShapes(n1);
+        Shape[] temp2 = new subShapes(n2);
+        Shape temp = cur;
+        while(temp != null){
+            if(temp instanceof Group == false) {
+                temp.getInfo(1);
+            }
+            temp = temp.previous;
+        }
+        return true;
+    }
 
+    public static Shape[] subShapes(Shape n){
+
+    }*/
     /**-----------------[Delete related methods]------------------------------------------------------------**/
 
     public static void delete(String name){     //delete function prototype part 1
@@ -158,7 +176,7 @@ class Line extends Shape {
         this.y2 = y2;
     }
     public void getInfo(int n){
-        System.out.println("[Shape tpye: Line] "+ "  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
+        System.out.println("[Shape type: Line] "+ "  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
     }
 
     public void move(double x, double y){
@@ -246,77 +264,81 @@ class Square extends Shape {
 //==================[GROUP CLASS]=====================================================================
 
 class Group extends Shape {
-    public Shape s1, s2;
+    public Shape[] s1;
 
-    Group(String name, Shape s1, Shape s2) {
+    Group(String name, Shape[] s1) {
         super(name);
         this.s1 = s1;
-        this.s2 = s2;
-        this.s1.grouparent = this;
-        this.s2.grouparent = this;
+        for (int i=0; i<s1.length; i++){
+            this.s1[i].grouparent = this;
+        }
     }
 
     public void getInfo(int n) {
         System.out.println("[Type: Group] " + " [Group name: " + this.getName() + "]");
         //System.out.println("previous: "+ this.previous + " next: "+ this.next + " GP: "+ this.grouparent);
-        for (int i = 0; i < n; i++) {
-            System.out.print("\t");
+        for(int i=0; i<s1.length; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.print("\t");
+            }
+            s1[i].getInfo(n + 1);
         }
-        s1.getInfo(n + 1);
-        for (int i = 0; i < n; i++) {
-            System.out.print("\t");
-        }
-        s2.getInfo(n + 1);
     }
 
     public double[] boundingbox() {
-        double[] s1boxArr = s1.boundingbox();
-        double[] s2boxArr = s2.boundingbox();
+        double[] s1boxArr = new double[4];
+        int i, j;
+        for (i=0; i<4; i++){
+            s1boxArr[i] = s1[0].boundingbox()[i];
+        }
+        double[] s2boxArr = new double[4];
         double[] result = new double[4];
-        if(s1boxArr[0]<s2boxArr[0]){
-            result[0]=s1boxArr[0];
-            if(s1boxArr[0]+s1boxArr[2]>s2boxArr[0]+s2boxArr[2]){
-                result[2]=s1boxArr[2];
+        for(i=1; i<s1.length; i++) {
+            for (j=0; j<4; j++){
+                s2boxArr[j] = s1[i].boundingbox()[j];
             }
-            else{
-                result[2]=s2boxArr[0]-s1boxArr[0]+s2boxArr[2];
+            if (s1boxArr[0] < s2boxArr[0]) {
+                result[0] = s1boxArr[0];
+                if (s1boxArr[0] + s1boxArr[2] > s2boxArr[0] + s2boxArr[2]) {
+                    result[2] = s1boxArr[2];
+                } else {
+                    result[2] = s2boxArr[0] - s1boxArr[0] + s2boxArr[2];
+                }
+            } else {
+                result[0] = s2boxArr[0];
+                if (s2boxArr[0] + s2boxArr[2] > s1boxArr[0] + s1boxArr[2]) {
+                    result[2] = s2boxArr[2];
+                } else {
+                    result[2] = s1boxArr[0] - s2boxArr[0] + s1boxArr[2];
+                }
+            }
+            if (s1boxArr[1] > s2boxArr[1]) {
+                result[1] = s1boxArr[1];
+                if (s1boxArr[1] - s1boxArr[3] < s2boxArr[1] - s2boxArr[3]) {
+                    result[3] = s1boxArr[3];
+                } else {
+                    result[3] = s1boxArr[1] - s2boxArr[1] + s2boxArr[3];
+                }
+            } else {
+                result[1] = s2boxArr[1];
+                if (s2boxArr[1] - s2boxArr[3] < s1boxArr[1] - s1boxArr[3]) {
+                    result[3] = s2boxArr[3];
+                } else {
+                    result[3] = s2boxArr[1] - s1boxArr[1] + s1boxArr[3];
+                }
+            }
+            for (j=0; j<4; j++){
+                s1boxArr[j] = result[j];
             }
         }
-        else{
-            result[0]=s2boxArr[0];
-            if(s2boxArr[0]+s2boxArr[2]>s1boxArr[0]+s1boxArr[2]){
-                result[2]=s2boxArr[2];
-            }
-            else{
-                result[2]=s1boxArr[0]-s2boxArr[0]+s1boxArr[2];
-            }
-        }
-        if(s1boxArr[1]>s2boxArr[1]){
-            result[1]=s1boxArr[1];
-            if(s1boxArr[1]-s1boxArr[3]<s2boxArr[1]-s2boxArr[3]){
-                result[3]=s1boxArr[3];
-            }
-            else{
-                result[3]=s1boxArr[1]-s2boxArr[1]+s2boxArr[3];
-            }
-        }
-        else{
-            result[1] = s2boxArr[1];
-            if(s2boxArr[1]-s2boxArr[3]<s1boxArr[1]-s1boxArr[3]){
-                result[3]=s2boxArr[3];
-            }
-            else{
-                result[3]=s2boxArr[1]-s1boxArr[1]+s1boxArr[3];
-            }
-        }
-
         return result;
     }
 
     public void delete() {
         if (this.grouparent == null) {
-            s1.delete();
-            s2.delete();
+            for (int i=0; i<s1.length; i++){
+                s1[i].delete();
+            }
             gdelete();
         } else {
             System.out.println("Deleting a component shape of a group is invalid!");
@@ -324,13 +346,15 @@ class Group extends Shape {
     }
 
     public void move(double x, double y) {
-        s1.move(x, y);
-        s2.move(x, y);
+        for (int i=0; i<s1.length; i++){
+            s1[i].move(x, y);
+        }
     }
 
     public void ungroup() {
-        s1.grouparent = null;
-        s2.grouparent = null;
+        for (int i=0; i<s1.length; i++){
+            s1[i].grouparent = null;
+        }
         gdelete();
     }
 

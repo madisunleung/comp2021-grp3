@@ -43,13 +43,29 @@ public class Clevis {
                     Shape.addShape(new Square(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4])));
                 }
             }
-            else if(sinput.matches("group "+nregex+" "+nregex+" "+nregex)){                             //Group construct, basically complete
-                System.out.println("group command recognized");
+            else if(sinput.startsWith("group ")){                             //Group construct, basically complete
                 String[] cmd = sinput.split(" ");
-                Shape a = Shape.findAShape(cmd[2]);
-                Shape b = Shape.findAShape(cmd[3]);
-                if(a != null && b != null) {
-                    Shape.addShape(new Group(cmd[1],a,b));
+                String cmdregex = "group";
+                boolean flag = true;
+                for(int i=1; i<cmd.length; i++){
+                    cmdregex = cmdregex + " " + nregex;
+                }
+                if (sinput.matches(cmdregex) && cmd.length >= 4) {
+                    System.out.println("group command recognized");
+                    Shape[] a = new Shape[cmd.length-2];
+                    for(int i=2; i<cmd.length; i++){
+                        a[i-2] = Shape.findAShape(cmd[i]);
+                    }
+                    if (nameNotUsed(cmd[1])) {
+                        for(int i=2; i<cmd.length; i++){
+                            if(a[i-2] == null || a[i-2].grouparent != null){
+                                flag = false;
+                            }
+                        }
+                        if (flag == true){
+                            Shape.addShape(new Group(cmd[1], a));
+                        }
+                    }
                 }
             }
             else if(sinput.matches("ungroup "+nregex)){                                                 //Ungroup action, basically complete
@@ -144,9 +160,9 @@ public class Clevis {
     public static void main(String[] args){     //my test case
         Rectangle R = new Rectangle("A Rectangle", 0,0,10,20);
         Line L = new Line("A Line",0,0,3,3);
-        Group G = new Group("A Group", R,L);
+        //Group G = new Group("A Group", R);
         new Circle("A Circle",0,0,30);
-        new Square("A Sqaure",0,0,5);
+        new Square("A Square",0,0,5);
         Shape.ListTest();
         Shape.delete("A Group");
         Shape.ListTest();
