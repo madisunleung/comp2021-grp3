@@ -1,17 +1,22 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.io.*;
 
 public class Clevis {
 
-    public Clevis(){            //Test comment message, hope you see this
+    public Clevis() throws IOException {            //Test comment message, hope you see this
         Scanner input = new Scanner(System.in);
+        ArrayList<String> cmds = new ArrayList<String>();
+        boolean invalid;
         String sinput;
         String fregex = "(-[0-9]+[.][0-9]+|-[0-9]+|[0-9]+[.][0-9]+|[0-9]+)";
         String nregex = "([a-zA-z0-9]+)";
         System.out.println("Welcome to CLEVIS!\n" +
                 "Made by group 3\n");
         do{
+            invalid = false;
             System.out.print("Please enter your command: ");
             sinput = input.nextLine();
             sinput= sinput.trim();
@@ -21,12 +26,18 @@ public class Clevis {
                 if (nameNotUsed(cmd[1])) {
                     Shape.addShape(new Rectangle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5])));
                 }
+                else{
+                    invalid = true;
+                }
             }
             else if(sinput.matches("line "+nregex+" "+fregex+" "+fregex+" "+fregex+" "+fregex)){        //Line construct, basically complete
                 System.out.println("line command recognized");
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
                     Shape.addShape(new Line(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5])));
+                }
+                else{
+                    invalid = true;
                 }
             }
             else if(sinput.matches("circle "+nregex+" "+fregex+" "+fregex+" "+fregex)){                 //Circle construct, basically complete
@@ -35,12 +46,18 @@ public class Clevis {
                 if (nameNotUsed(cmd[1])) {
                     Shape.addShape(new Circle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4])));
                 }
+                else{
+                    invalid = true;
+                }
             }
             else if(sinput.matches("square "+nregex+" "+fregex+" "+fregex+" "+fregex)){                 //Square construct, basically complete
                 System.out.println("square command recognized");
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
                     Shape.addShape(new Square(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4])));
+                }
+                else{
+                    invalid = true;
                 }
             }
             else if(sinput.startsWith("group ")){                             //Group construct, basically complete
@@ -66,6 +83,9 @@ public class Clevis {
                             Shape.addShape(new Group(cmd[1], a));
                         }
                     }
+                    else{
+                        invalid = true;
+                    }
                 }
             }
             else if(sinput.matches("ungroup "+nregex)){                                                 //Ungroup action, basically complete
@@ -74,13 +94,14 @@ public class Clevis {
                 Shape temp = Shape.findAShape(cmd[1]);
                 if (!(temp instanceof Group)&& temp != null){
                     System.out.println("This is not a group.");
+                    invalid = true;
                 }
                 else if(temp != null) temp.ungroup();
             }
             else if(sinput.matches("delete "+nregex)){                                                  //Delete on a certain shape, basically complete
                 System.out.println("delete command recognized");
                 String[] cmd = sinput.split(" ");
-                Shape.delete(cmd[1]);
+                invalid = Shape.delete(cmd[1]);
             }
             else if(sinput.matches("boundingbox "+nregex)){                                             //Bounding box, basically complete
                 System.out.println("boundingbox command recognized");
@@ -91,8 +112,10 @@ public class Clevis {
                     System.out.println("Bounding box of "+cmd[1]+" is: x: "+String.format("%.2f",result[0])+" y: "+String.format("%.2f",result[1])+" w: "+String.format("%.2f",result[2])+" h: "+String.format("%.2f",result[3]));
                 } else if(temp == null){
                     System.out.println("No shape with such name is found.");
+                    invalid = true;
                 }else {
                     System.out.println("Cannot perform action on group component!");
+                    invalid = true;
                 }
             }
             else if(sinput.matches("move "+nregex+" "+fregex+" "+fregex)){                             //Move a shape, basically complete
@@ -104,8 +127,10 @@ public class Clevis {
                }
                else if(temp == null){
                    System.out.println("No shape with such name is found.");
+                   invalid = true;
                }else {
                    System.out.println("Cannot perform action on group component!");
+                   invalid=true;
                }
             }
             else if(sinput.matches("pick-and-move "+fregex+" "+fregex+" "+fregex+" "+fregex)){
@@ -123,9 +148,11 @@ public class Clevis {
                 }
                 else if(temp == null){
                     System.out.println("No shape with such name is found.");
+                    invalid = true;
                 }
                 else {
                     System.out.println("Cannot perform action on group component!");
+                    invalid = true;
                 }
             }
             else if(sinput.equals("listAll")){                                                           //List all the shape, basically complete
@@ -134,7 +161,6 @@ public class Clevis {
             }
             else if(sinput.equals("quit")){                                                             //Quit the CLI, no need to check this right?
                 System.out.println("Quitting...");
-                break;
             }
             else if(sinput.equals("listHead")){
                 System.out.println("listHead test");
@@ -142,8 +168,28 @@ public class Clevis {
             }
             else{                                                                                       //Happens when the command is not recognized
                 System.out.println("Invalid command!");
+                invalid = true;
+            }
+            if(!invalid){
+                cmds.add(sinput);
             }
         }while(!sinput.equals("quit"));
+
+
+
+        System.out.println("Creating logs...");
+        String a = "txt.txt";
+        String b = "yee.html";
+        File txt = new File(a);
+        File html = new File(b);
+        BufferedWriter tw = new BufferedWriter(new FileWriter(txt));
+        BufferedWriter hw = new BufferedWriter(new FileWriter(html));
+        for(int i = 0; i < cmds.size();i++){
+            tw.write(cmds.get(i)+"\n");
+            hw.write(i+1+"\t\t"+cmds.get(i)+"<br>");
+        }
+        tw.close();
+        hw.close();
     }
 
 

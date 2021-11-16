@@ -80,16 +80,19 @@ public class Shape {
     }*/
     /**-----------------[Delete related methods]------------------------------------------------------------**/
 
-    public static void delete(String name){     //delete function prototype part 1
+    public static boolean delete(String name){     //delete function prototype part 1
         Shape target = findAShape(name);
         if(target != null) {
             if(target.grouparent == null) {
                 target.delete();
+                return false;
             }
             else{
                 System.out.println("Deleting a component shape of a group is invalid!");
+                return true;
             }
         }
+        return true;
     }
 
     public void delete() {      //delete function prototype part 2 (v2)
