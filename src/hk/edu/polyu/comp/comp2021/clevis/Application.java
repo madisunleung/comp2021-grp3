@@ -20,5 +20,4 @@ public class Application {
         }
         // Initialize and utilize the system
     }
-
 }
