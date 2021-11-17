@@ -119,10 +119,12 @@ public class Shape {
     }
     public void undelete() {
         SaveUndo(this,2);
-        if (this.previous != null && this.next == null) {
+        if (cur == null) {
             cur = this;
-        }    else {
+        }   else if (this.previous == null && this.next != null) {
             this.next.previous = this;
+        } else {
+            cur = this;
         }
     }
 
@@ -190,7 +192,7 @@ public class Shape {
     }
 
     public static void Undos(){
-        System.out.println(code.toString());
+        //System.out.println(code.toString());
         if (!undo.empty()) {
             Shape target = undo.pop();
             switch(code.pop()){
@@ -221,7 +223,7 @@ public class Shape {
     }
     /*Redo command pair codes are reversed*/
     public static void Redo(){
-        System.out.println(recode.toString());
+        //System.out.println(recode.toString());
         if (!redo.empty()) {
             Shape target = redo.pop();
             switch(recode.pop()){
@@ -261,9 +263,11 @@ class Rectangle extends Shape {
         this.w = w;
         this.h = h;
     }
+    @Override
     public void getInfo(int n){
         System.out.println("[Shape type: Rectangle] " + " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [width: "+String.format("%.2f",w)+"]  [height: "+String.format("%.2f",h)+"]");
     }
+    @Override
     public void move(double x, double y){
         SaveUndo(this, 3);
         SaveMove(x, y);
@@ -271,6 +275,7 @@ class Rectangle extends Shape {
         this.y = this.y + y;
     }
 
+    @Override
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x;
@@ -297,10 +302,12 @@ class Line extends Shape {
         this.y1 = y1;
         this.y2 = y2;
     }
+    @Override
     public void getInfo(int n){
         System.out.println("[Shape type: Line] "+ "  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
     }
 
+    @Override
     public void move(double x, double y){
         SaveUndo(this, 3);
         SaveMove(x, y);
@@ -310,6 +317,7 @@ class Line extends Shape {
         this.y2 = this.y2 + y;
     }
 
+    @Override
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x1 < this.x2 ? this.x1 : this.x2; //smaller x
@@ -325,7 +333,7 @@ class Line extends Shape {
 //======================[CIRCLE CLASS]=============================================================================
 
 
-class Circle extends Shape {
+class  Circle extends Shape {
     public double x, y, r;
 
     Circle(String name, double x, double y, double r) {
@@ -335,9 +343,11 @@ class Circle extends Shape {
         this.y = y;
         this.r = r;
     }
+    @Override
     public void getInfo(int n){
         System.out.println("[Shape type: Circle] "+ " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [radius: "+String.format("%.2f",r)+"]");
     }
+    @Override
     public void move(double x, double y){
         SaveUndo(this, 3);
         SaveMove(x, y);
@@ -345,6 +355,7 @@ class Circle extends Shape {
         this.y = this.y + y;
     }
 
+    @Override
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x - this.r; //upper left corner x
@@ -370,9 +381,11 @@ class Square extends Shape {
         this.y = y;
         this.l = l;
     }
+    @Override
     public void getInfo(int n){
         System.out.println("[Shape type: Square] "+" [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [side length: "+String.format("%.2f",l)+"]");
     }
+    @Override
     public void move(double x, double y){
         SaveUndo(this, 3);
         SaveMove(x, y);
@@ -380,6 +393,7 @@ class Square extends Shape {
         this.y = this.y + y;
     }
 
+    @Override
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x;
@@ -405,6 +419,7 @@ class Group extends Shape {
         }
     }
 
+    @Override
     public void getInfo(int n) {
         System.out.println("[Type: Group] " + " [Group name: " + this.getName() + "]");
         //System.out.println("previous: "+ this.previous + " next: "+ this.next + " GP: "+ this.grouparent);
@@ -416,6 +431,7 @@ class Group extends Shape {
         }
     }
 
+    @Override
     public double[] boundingbox() {
         double[] s1boxArr = new double[4];
         int i, j;
@@ -465,6 +481,7 @@ class Group extends Shape {
         return result;
     }
 
+    @Override
     public void delete() {
         SaveUndo(this,1);
         if (this.grouparent == null) {
@@ -474,6 +491,7 @@ class Group extends Shape {
         }
     }
 
+    @Override
     public void move(double x, double y) {
         SaveUndo(this,3);
         SaveMove(x,y);
@@ -484,6 +502,7 @@ class Group extends Shape {
         }
     }
 
+    @Override
     public void ungroup() {
         SaveUndo(this, 4);
         for (int i=0; i<s1.length; i++){
@@ -507,15 +526,19 @@ class Group extends Shape {
         }
     }
 
+    @Override
     public void undelete() {
-        SaveUndo(this, 2);
-        if (this.previous != null && this.next == null) {
+        SaveUndo(this,2);
+        if (cur == null) {
             cur = this;
-        }    else {
+        }   else if (this.previous == null && this.next != null) {
             this.next.previous = this;
+        } else {
+            cur = this;
         }
     }
 
+    @Override
     public void regroup() {
         SaveUndo(this, 5);
         undelete();

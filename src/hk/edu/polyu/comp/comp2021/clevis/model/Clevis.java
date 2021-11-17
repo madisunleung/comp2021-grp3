@@ -4,7 +4,22 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.*;
 
+
+/**
+ *
+ * Main application CLI for executing the commands
+ *
+ */
+
+
 public class Clevis {
+
+    /**
+     *
+     * @param hname The name of the html file
+     * @param tname The name of the txt file
+     * @throws IOException Exception thrown for Input output issues in writing the files
+     */
 
     public Clevis(String hname, String tname) throws IOException {            //Test comment message, hope you see this
         Scanner input = new Scanner(System.in);
@@ -79,7 +94,7 @@ public class Clevis {
                     }
                     if (nameNotUsed(cmd[1])) {
                         for(int i=2; i<cmd.length; i++){
-                            if(a[i-2] == null || a[i-2].grouparent != null){
+                            if(a[i-2] == null || a[i - 2].grouparent != null){
                                 flag = false;
                             }
                         }
@@ -210,7 +225,11 @@ public class Clevis {
         hw.close();
     }
 
-
+    /**
+     *
+     * @param name  Finds a shape with that name, to see if it is used
+     * @return      give false when the name is used by a shape in the list, else true
+     */
     public boolean nameNotUsed(String name){                  //method called when constructing new shapes, checks if the name is used or not
         if(Shape.findAShape(name)==null){
             return true;
@@ -220,7 +239,7 @@ public class Clevis {
             return false;
         }
     }
-
+    /*
     public static void main(String[] args){     //my test case
         Shape.addShape(new Rectangle("A", 0, 0, 10, 20));
         Shape.addShape(new Rectangle("B", 0, 0, 10, 20));
@@ -255,5 +274,7 @@ public class Clevis {
         Shape.Redo();
         Shape.ListTest();
     }
+
+     */
 
 }
