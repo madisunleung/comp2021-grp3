@@ -6,7 +6,7 @@ import java.io.*;
 
 public class Clevis {
 
-    public Clevis() throws IOException {            //Test comment message, hope you see this
+    public Clevis(String hname, String tname) throws IOException {            //Test comment message, hope you see this
         Scanner input = new Scanner(System.in);
         ArrayList<String> cmds = new ArrayList<String>();
         boolean invalid;
@@ -175,13 +175,12 @@ public class Clevis {
             }
         }while(!sinput.equals("quit"));
 
-
+        File folder = new File("outputs");
+        folder.mkdir();
 
         System.out.println("Creating logs...");
-        String a = "txt.txt";
-        String b = "yee.html";
-        File txt = new File(a);
-        File html = new File(b);
+        File txt = new File("outputs\\"+tname);
+        File html = new File("outputs\\"+hname);
         BufferedWriter tw = new BufferedWriter(new FileWriter(txt));
         BufferedWriter hw = new BufferedWriter(new FileWriter(html));
         for(int i = 0; i < cmds.size();i++){

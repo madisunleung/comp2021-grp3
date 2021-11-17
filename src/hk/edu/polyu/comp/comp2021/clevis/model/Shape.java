@@ -88,7 +88,10 @@ public class Shape {
                 return true;
             }
         }
-        return true;
+        else{
+            System.out.println("No shape with such name is found.");
+            return true;
+        }
     }
 
     public void delete() {      //delete function prototype part 2 (v2)
