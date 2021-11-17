@@ -1,8 +1,8 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
 import org.w3c.dom.css.Rect;
-
 import java.util.Arrays;
+import java.util.Stack;
 
 public class Shape {
     /**                 Basic Settings              **/
@@ -10,6 +10,7 @@ public class Shape {
     Shape next;
     Shape previous;
     Shape grouparent = null;
+    
 
     public static Shape cur=null;
     public static Shape head= null;
@@ -31,6 +32,7 @@ public class Shape {
             a.previous=cur;
         }
         cur = a;
+        
     }
 
     public String getName() {
@@ -46,6 +48,8 @@ public class Shape {
     }
 
     public void ungroup(){}
+
+    public void regroup(){}
 
     public static Shape findAShape(String name) {        //finds and returns the shape with a name
         Shape temp = cur;
@@ -99,6 +103,7 @@ public class Shape {
     }
 
     public void delete() {      //delete function prototype part 2 (v2)
+        SaveUndo(this,1);
         if (this.previous == null && this.next != null) {
             this.next.previous = null;
         } else if (this.next == null && this.previous != null) {
@@ -112,6 +117,16 @@ public class Shape {
             cur = this.previous;
         }
     }
+    public void undelete() {
+        SaveUndo(this,2);
+        if (this.previous != null && this.next == null) {
+            cur = this;
+        }    else {
+            this.next.previous = this;
+        }
+    }
+
+    
 
     /**---------------[List related methods]------------------------------------------------------------**/
 
@@ -131,7 +146,104 @@ public class Shape {
             temp = temp.next;
         }
     }
+    /**---------------[Undo related methods]------------------------------------------------------------*/
+    static Stack<Shape> undo = new Stack<Shape>();
+    static Stack<Integer> code = new Stack<Integer>();
+    static Stack<Double> movx = new Stack<Double>();
+    static Stack<Double> movy = new Stack<Double>();
+    static Stack<Shape> redo = new Stack<Shape>();
+    static Stack<Integer> recode = new Stack<Integer>();
+    static Stack<Double> removx = new Stack<Double>();
+    static Stack<Double> removy = new Stack<Double>();
+    /**undoable methods:
+     * re-add/delete 1,2
+     * move 3
+     * re-group/ungroup 4,5
+     */
+    public static void SaveUndo(Shape target,int number){//all the above methods use this to save to the undo list
+        undo.push(target);
+        code.push(number);
+    }
+    public static void SaveMove(Double x,Double y){//save the reverse action of the move
+        movx.push(-x);
+        movy.push(-y);
+    }
+    public static void PopUndo(){
+        undo.pop();
+        code.pop();
+    }
+    public static void PopMove(){
+        movx.pop();
+        movy.pop();
+    }
+    public static void ClearRedo(){
+        redo.clear();
+        recode.clear();
+    }
+    public static void SaveRedo(Shape target,int number){//same implementation for redo
+        redo.push(target);
+        recode.push(number);
+    }
+    public static void SavereMove(Double x,Double y){//use the reversed save of the move
+        removx.push(x);
+        removy.push(y);
+    }
 
+    public static void Undos(){
+        System.out.println(code.toString());
+        if (!undo.empty()) {
+            Shape target = undo.pop();
+            switch(code.pop()){
+                case 1:
+                    target.undelete();
+                    SaveRedo(undo.pop(),code.pop());
+                    break;
+                case 2:
+                    target.delete();
+                    SaveRedo(undo.pop(),code.pop());
+                    break;
+                case 3:
+                    target.move(movx.pop(),movy.pop());
+                    SaveRedo(undo.pop(),code.pop());
+                    SavereMove(movx.pop(),movy.pop());
+                    break;
+                case 4:
+                    target.regroup();
+                    SaveRedo(undo.pop(),code.pop());
+                    break;
+                case 5:
+                    target.ungroup();
+                    SaveRedo(undo.pop(),code.pop());
+                    break;
+            }
+        }
+            
+    }
+    /*Redo command pair codes are reversed*/
+    public static void Redo(){
+        System.out.println(recode.toString());
+        if (!redo.empty()) {
+            Shape target = redo.pop();
+            switch(recode.pop()){
+                case 1:
+                    target.undelete();
+                    break;
+                case 2:
+                    target.delete();
+                    break;
+                case 3:
+                    target.move(removx.pop(),removy.pop());
+                    break;
+                case 4:
+                    target.regroup();
+                    break;
+                case 5:
+                    target.ungroup();
+                    break;
+            }
+        }
+            
+    }
 }
 
 
@@ -143,6 +255,7 @@ class Rectangle extends Shape {
 
     Rectangle(String name, double x, double y, double w, double h) {
         super(name);
+        SaveUndo(this,2);
         this.x = x;
         this.y = y;
         this.w = w;
@@ -152,6 +265,8 @@ class Rectangle extends Shape {
         System.out.println("[Shape type: Rectangle] " + " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [width: "+String.format("%.2f",w)+"]  [height: "+String.format("%.2f",h)+"]");
     }
     public void move(double x, double y){
+        SaveUndo(this, 3);
+        SaveMove(x, y);
         this.x = this.x + x;
         this.y = this.y + y;
     }
@@ -176,6 +291,7 @@ class Line extends Shape {
 
     Line(String name, double x1, double y1, double x2, double y2) {
         super(name);
+        SaveUndo(this,2);
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;
@@ -186,6 +302,8 @@ class Line extends Shape {
     }
 
     public void move(double x, double y){
+        SaveUndo(this, 3);
+        SaveMove(x, y);
         this.x1 = this.x1 + x;
         this.x2 = this.x2 + x;
         this.y1 = this.y1 + y;
@@ -212,6 +330,7 @@ class Circle extends Shape {
 
     Circle(String name, double x, double y, double r) {
         super(name);
+        SaveUndo(this,2);
         this.x = x;
         this.y = y;
         this.r = r;
@@ -220,6 +339,8 @@ class Circle extends Shape {
         System.out.println("[Shape type: Circle] "+ " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [radius: "+String.format("%.2f",r)+"]");
     }
     public void move(double x, double y){
+        SaveUndo(this, 3);
+        SaveMove(x, y);
         this.x = this.x + x;
         this.y = this.y + y;
     }
@@ -244,6 +365,7 @@ class Square extends Shape {
 
     Square(String name, double x, double y, double l) {
         super(name);
+        SaveUndo(this,2);
         this.x = x;
         this.y = y;
         this.l = l;
@@ -252,6 +374,8 @@ class Square extends Shape {
         System.out.println("[Shape type: Square] "+" [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [side length: "+String.format("%.2f",l)+"]");
     }
     public void move(double x, double y){
+        SaveUndo(this, 3);
+        SaveMove(x, y);
         this.x = this.x + x;
         this.y = this.y + y;
     }
@@ -274,6 +398,7 @@ class Group extends Shape {
 
     Group(String name, Shape[] s1) {
         super(name);
+        SaveUndo(this,5);
         this.s1 = s1;
         for (int i=0; i<s1.length; i++){
             this.s1[i].grouparent = this;
@@ -341,10 +466,8 @@ class Group extends Shape {
     }
 
     public void delete() {
+        SaveUndo(this,1);
         if (this.grouparent == null) {
-            for (int i=0; i<s1.length; i++){
-                s1[i].delete();
-            }
             gdelete();
         } else {
             System.out.println("Deleting a component shape of a group is invalid!");
@@ -352,12 +475,17 @@ class Group extends Shape {
     }
 
     public void move(double x, double y) {
+        SaveUndo(this,3);
+        SaveMove(x,y);
         for (int i=0; i<s1.length; i++){
             s1[i].move(x, y);
+            PopUndo();
+            PopMove();
         }
     }
 
     public void ungroup() {
+        SaveUndo(this, 4);
         for (int i=0; i<s1.length; i++){
             s1[i].grouparent = null;
         }
@@ -376,6 +504,24 @@ class Group extends Shape {
         }
         if (cur == this) {
             cur = this.previous;
+        }
+    }
+
+    public void undelete() {
+        SaveUndo(this, 2);
+        if (this.previous != null && this.next == null) {
+            cur = this;
+        }    else {
+            this.next.previous = this;
+        }
+    }
+
+    public void regroup() {
+        SaveUndo(this, 5);
+        undelete();
+        PopUndo();
+        for (int i=0; i<s1.length; i++){
+            this.s1[i].grouparent = this;
         }
     }
 

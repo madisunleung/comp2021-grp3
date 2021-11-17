@@ -25,6 +25,7 @@ public class Clevis {
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
                     Shape.addShape(new Rectangle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5])));
+                    Shape.ClearRedo();
                 }
                 else{
                     invalid = true;
@@ -35,6 +36,7 @@ public class Clevis {
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
                     Shape.addShape(new Line(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5])));
+                    Shape.ClearRedo();
                 }
                 else{
                     invalid = true;
@@ -45,6 +47,7 @@ public class Clevis {
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
                     Shape.addShape(new Circle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4])));
+                    Shape.ClearRedo();
                 }
                 else{
                     invalid = true;
@@ -55,6 +58,7 @@ public class Clevis {
                 String[] cmd = sinput.split(" ");
                 if (nameNotUsed(cmd[1])) {
                     Shape.addShape(new Square(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4])));
+                    Shape.ClearRedo();
                 }
                 else{
                     invalid = true;
@@ -81,6 +85,7 @@ public class Clevis {
                         }
                         if (flag == true){
                             Shape.addShape(new Group(cmd[1], a));
+                            Shape.ClearRedo();
                         }
                     }
                     else{
@@ -96,12 +101,16 @@ public class Clevis {
                     System.out.println("This is not a group.");
                     invalid = true;
                 }
-                else if(temp != null) temp.ungroup();
+                else if(temp != null) {
+                    temp.ungroup();
+                    Shape.ClearRedo();
+                }
             }
             else if(sinput.matches("delete "+nregex)){                                                  //Delete on a certain shape, basically complete
                 System.out.println("delete command recognized");
                 String[] cmd = sinput.split(" ");
                 invalid = Shape.delete(cmd[1]);
+                Shape.ClearRedo();
             }
             else if(sinput.matches("boundingbox "+nregex)){                                             //Bounding box, basically complete
                 System.out.println("boundingbox command recognized");
@@ -124,6 +133,7 @@ public class Clevis {
                Shape temp =  Shape.findAShape(cmd[1]);
                if(temp != null && temp.grouparent == null){
                    temp.move(Double.parseDouble(cmd[2]),Double.parseDouble(cmd[3]));
+                   Shape.ClearRedo();
                }
                else if(temp == null){
                    System.out.println("No shape with such name is found.");
@@ -135,6 +145,7 @@ public class Clevis {
             }
             else if(sinput.matches("pick-and-move "+fregex+" "+fregex+" "+fregex+" "+fregex)){
                 System.out.println("pick-and-move command recognized");
+                Shape.ClearRedo();
             }
             else if(sinput.matches("intersect "+nregex+" "+nregex)){
                 System.out.println("intersect command recognized");
@@ -165,6 +176,14 @@ public class Clevis {
             else if(sinput.equals("listHead")){
                 System.out.println("listHead test");
                 Shape.ListFromHead();
+            }
+            else if(sinput.equals("undo")){
+                System.out.println("undo command recognised");
+                Shape.Undos();
+            }
+            else if(sinput.equals("redo")){
+                System.out.println("redo command recognised");
+                Shape.Redo();
             }
             else{                                                                                       //Happens when the command is not recognized
                 System.out.println("Invalid command!");
@@ -203,13 +222,37 @@ public class Clevis {
     }
 
     public static void main(String[] args){     //my test case
-        Rectangle R = new Rectangle("A Rectangle", 0,0,10,20);
-        Line L = new Line("A Line",0,0,3,3);
-        //Group G = new Group("A Group", R);
-        new Circle("A Circle",0,0,30);
-        new Square("A Square",0,0,5);
+        Shape.addShape(new Rectangle("A", 0, 0, 10, 20));
+        Shape.addShape(new Rectangle("B", 0, 0, 10, 20));
         Shape.ListTest();
-        Shape.delete("A Group");
+        Shape.Undos();
+        Shape.ListTest();
+        Shape.Redo();
+        Shape.ListTest();
+        Shape[] temp = {Shape.findAShape("A"), Shape.findAShape("B")};
+        Shape.addShape(new Group("group",temp));
+        Shape.ListTest();
+        Shape.Undos();
+        Shape.ListTest();
+        Shape.Redo();
+        Shape.ListTest();
+        Shape.findAShape("group").move(100,100);
+        Shape.ListTest();
+        Shape.Undos();
+        Shape.ListTest();
+        Shape.Redo();
+        Shape.ListTest();
+        Shape.findAShape("group").ungroup();
+        Shape.ListTest();
+        Shape.Undos();
+        Shape.ListTest();
+        Shape.Redo();
+        Shape.ListTest();
+        Shape.findAShape("A").delete();
+        Shape.ListTest();
+        Shape.Undos();
+        Shape.ListTest();
+        Shape.Redo();
         Shape.ListTest();
     }
 
