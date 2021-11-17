@@ -10,5 +10,4 @@ public class Application {
         Clevis clevis = new Clevis();
         // Initialize and utilize the system
     }
-
 }

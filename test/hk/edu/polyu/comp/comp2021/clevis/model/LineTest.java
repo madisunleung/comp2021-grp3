@@ -4,13 +4,18 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ClevisTest {
+class LineTest {
 
     @Test
-    void nameNotUsed() {
+    void getInfo() {
+
     }
 
     @Test
-    void main() {
+    void move() {
+    }
+
+    @Test
+    void boundingbox() {
     }
 }
