@@ -40,13 +40,15 @@ public class Clevis {
      */
     protected String nregex = "([a-zA-z0-9]+)";
 
-    protected boolean cont = true;
-
+    /**
+     * Allows creation of clevis instance without parameters, but not automatically going into
+     */
     public Clevis(){}
     /**
      * Clevis, keeps looping to read user input and do the commands until quit is called
      * @param hname     The name of the html log file
      * @param tname     The name of the txt log file
+     *@throws IOException      Throws exception when there are issues with Input/Output
      */
 
 
@@ -54,6 +56,7 @@ public class Clevis {
     public Clevis(String hname, String tname) throws IOException {
         System.out.println("Welcome to CLEVIS!\n" +
                 "Made by group 3\n");
+        boolean cont = true;
         while(cont){
             System.out.print("Please enter your command: ");
             sinput = input.nextLine();
@@ -66,6 +69,7 @@ public class Clevis {
 
     /**
      * The CLI to read user input, check if the command is valid, and calls corresponding methods to perform actions
+     * @param s    The user's command to be recognized and executed
      * @return     a boolean, that indicates if the program will continue(true) or teminate(false)
      */
 
@@ -406,6 +410,13 @@ public class Clevis {
         }
     }
 
+    /**
+     * method writeLogs:
+     * write and outputs the valid cmds
+     * @param hname     The name of the html log
+     * @param tname     The name of the txt log
+     * @throws IOException      Exception thrown on Input output exception
+     */
     public void writeLogs(String hname, String tname) throws IOException {
         File folder = new File("outputs");
         folder.mkdir();

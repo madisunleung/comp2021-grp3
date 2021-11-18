@@ -20,22 +20,6 @@ class SquareTest {
         squr4.getInfo(4);
     }
 
-    @Test
-    void move() {
-        squr1.move(4, 5);
-        assertEquals(7, squr1.getX());
-        assertEquals(8, squr1.getY());
-
-        squr3.move(4, 5);
-        assertNotEquals(7, squr3.getX());
-        assertNotEquals(8, squr3.getY());
-        assertEquals(11, squr3.getX());
-        assertEquals(13, squr3.getY());
-
-        squr4.move(9.8765, 4.321);
-        assertEquals(11.1105, squr4.getX());
-        assertEquals(9.991, squr4.getY());
-    }
 
     @Test
     void boundingbox() {

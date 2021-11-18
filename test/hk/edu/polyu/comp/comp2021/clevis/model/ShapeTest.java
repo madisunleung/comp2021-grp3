@@ -16,9 +16,8 @@ class ShapeTest {
     Shape rec2 = new Rectangle("rec2", 6, 6, 8, 9);
     Shape line1 = new Line("line1", 3, 3, 5, 7);
     Shape line2 = new Line("line1", 3, 3, 5, 7);
-    Shape[] g = {squr1, cir1,rec1,line1};
+    Shape[] g = {squr1, cir1, rec1, line1};
     Group grp = new Group("x", g);
-
 
 
     @Test
@@ -48,13 +47,6 @@ class ShapeTest {
         //it just prints out the information of the Shape in the method of getInfo.
     }
 
-    @Test
-    void testMove() {
-        Square x = new Square("x", 3, 3, 3);
-        x.move(10, 20);
-        assertEquals(13, x.getX());
-        assertEquals(23, x.getY());
-    }
 
     @Test
     void testBoundingbox() {
@@ -99,7 +91,7 @@ class ShapeTest {
     @Test
     void findAShape() {
         Shape.addShape(grp);
-        assertEquals(grp,Shape.findAShape("x"));
+        assertEquals(grp, Shape.findAShape("x"));
     }
 
     @Test
@@ -109,7 +101,7 @@ class ShapeTest {
         Shape.addShape(rec1);
         Shape.addShape(line1);
         Shape.addShape(grp);
-        assertEquals(grp,squr1.belongToGroup());
+        assertEquals(grp, squr1.belongToGroup());
     }
 
     @Test
@@ -184,57 +176,5 @@ class ShapeTest {
 
     @Test
     void savereMove() {
-    }
-
-    @Test
-    void undos() {
-        Square hi = new Square("hi",3,3,3);
-        Shape.addShape(hi);
-        //First case, move undo
-        hi.getInfo(1);
-        hi.move(10,10);
-        hi.getInfo(1);
-        Shape.Undos();
-        assertEquals(3, hi.getX());
-        assertEquals(3, hi.getY());
-        assertEquals(3, hi.getL());
-        hi.getInfo(1);
-        //of course we can do more undos in a row
-        hi.move(10,10);
-        hi.getInfo(1);
-        hi.move(5,100);
-        hi.getInfo(1);
-        Shape.Undos();
-        Shape.Undos();
-        assertEquals(3, hi.getX());
-        assertEquals(3, hi.getY());
-        assertEquals(3, hi.getL());
-        hi.getInfo(1);
-    }
-
-    @Test
-    void redo() {
-        //Here is everything the same as the previous, we have to do undos before we can do a redo of course.
-        Square hi = new Square("hi",3,3,3);
-        Shape.addShape(hi);
-        //First case, move undo
-        hi.getInfo(1);
-        hi.move(10,10);
-        hi.getInfo(1);
-        Shape.Undos();
-        hi.getInfo(1);
-        //of course we can do more undos in a row
-        hi.move(10,10);
-        hi.getInfo(1);
-        hi.move(5,100);
-        hi.getInfo(1);
-        Shape.Undos();
-        Shape.Undos();
-        hi.getInfo(1);
-        Shape.Redo();
-        hi.getInfo(1);           //reverted one undo (3,3,3)->(13,13,3)->(18,113,3)->undone(13,13,3)->undone(3,3,3)->redone(13,13,3)
-        assertEquals(13, hi.getX());
-        assertEquals(13, hi.getY());
-        assertEquals(3, hi.getL());
     }
 }

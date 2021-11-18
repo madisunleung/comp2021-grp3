@@ -698,16 +698,21 @@ public class Shape {
      */
     public void delete() {      //delete function prototype part 2
         SaveUndo(this,1);
-        if (this.getPrevious() == null && this.getNext() != null) {
+        if (this.getPrevious() == null && this.getNext() != null && getCur() != this) {
+            //System.out.println("Did type 1 delete");
             this.getNext().setPrevious(null);
-        } else if (this.getNext() == null && this.getPrevious() != null) {
+        } else if ((this.getNext() == null && this.getPrevious() != null) ||( getCur() == this)) {
+            //System.out.println("Did type 2 delete");
             setCur(this.getPrevious());
         } else if (this.getPrevious() != null) {
+            //System.out.println("Did type 3 delete");
             this.getNext().setPrevious(this.getPrevious());
         } else {
+            //System.out.println("Did type 4 delete");
             setCur(null);
         }
         if(getCur() == this){
+            //System.out.println("cur = this, cur = this.previous");
             setCur(this.getPrevious());
         }
     }
@@ -719,10 +724,19 @@ public class Shape {
     public void undelete() {
         SaveUndo(this,2);
         if (getCur() == null) {
+            //System.out.println("Counter type 4 delete");
             setCur(this);
-        }   else if (this.getPrevious() == null && this.getNext() != null) {
+        }
+        else if (this.getPrevious() == null && this.getNext() != null) {
+            //System.out.println("Counter type 1 delete");
             this.getNext().setPrevious(this);
-        } else {
+        }
+        else if(this.getPrevious() != null && this.getNext() != null && this.getPrevious() != getCur()){
+            //System.out.println("Counter type 3 delete");
+            this.getNext().setPrevious(this);
+        }
+        else {
+            //System.out.println("Weird");
             setCur(this);
         }
     }
@@ -760,47 +774,99 @@ public class Shape {
     }
     /**---------------[Undo related methods]------------------------------------------------------------*/
     protected static Stack<Shape> undo = new Stack<Shape>();
+    /**-*/
     protected static Stack<Integer> code = new Stack<Integer>();
+    /**-*/
     protected static Stack<Double> movx = new Stack<Double>();
+    /**-*/
     protected static Stack<Double> movy = new Stack<Double>();
+    /**-*/
     protected static Stack<Shape> redo = new Stack<Shape>();
+    /**-*/
     protected static Stack<Integer> recode = new Stack<Integer>();
+    /**-*/
     protected static Stack<Double> removx = new Stack<Double>();
+    /**-*/
     protected static Stack<Double> removy = new Stack<Double>();
     /**undoable methods:
      * re-add/delete 1,2
      * move 3
      * re-group/ungroup 4,5
      */
+
+    /**
+     * static method SaveUndo:
+     * After execution of an undoable method, pushes the Shape and command code into static stacks to execute later in method Undos
+     * @param target The targeted Shape of the executed command
+     * @param number The code number of the executed command/
+     */
     public static void SaveUndo(Shape target,int number){//all the above methods use this to save to the undo list
         undo.push(target);
         code.push(number);
     }
+    /**
+     * static method SaveMove:
+     * After execution of a Move method, pushes the complement of the vertical and horizontal displacement into static stacks to execute later in method Undos
+     * @param x The horizontal displacement of the move command
+     * @param y The vertical displacement of the move command
+     */
     public static void SaveMove(Double x,Double y){//save the reverse action of the move
         movx.push(-x);
         movy.push(-y);
     }
+    /**
+     * static method PopUndo:
+     * When redundant SaveUndo methods are executed, this method is used to pop excessive commands saved in the stack
+     */
     public static void PopUndo(){
         undo.pop();
         code.pop();
     }
+    /**
+     * static method PopMove:
+     * when the Move method is called on a Group Shape, this method is used to pop redundant commands
+     */
     public static void PopMove(){
         movx.pop();
         movy.pop();
     }
+    /**
+     * static method ClearRedo:
+     * When an undoable method is recognised, this method is called and clears the redo stack
+     */
     public static void ClearRedo(){
         redo.clear();
         recode.clear();
     }
+    /**
+     * static method SaveRedo:
+     * When an Undos method is invoked, this method is called and saves the redo command for the Undos Method
+     * @param target The targeted Shape of the executed command
+     * @param number The code number of the executed command
+     */
     public static void SaveRedo(Shape target,int number){//same implementation for redo
         redo.push(target);
         recode.push(number);
     }
+    /**
+     * static method SavereMove:
+     * When a Move method is invoked by Undos, this method is called and saves the move parameters
+     * @param x The horizontal displacement of the move command
+     * @param y The vertical displacement of the move command
+     */
     public static void SavereMove(Double x,Double y){//use the reversed save of the move
         removx.push(x);
         removy.push(y);
     }
-
+    /**
+     * static method Undos:
+     * Pops the undo command stack and executes the respective command according to the code. Invokes SaveRedo after execution of the specified command.
+     * code 1: invokes undelete
+     * code 2: invokes delete
+     * code 3: invokes move
+     * code 4: invokes regroup
+     * code 5: invokes ungroup
+     */
     public static void Undos(){
         //System.out.println(code.toString());
         if (!undo.empty()) {
@@ -832,6 +898,15 @@ public class Shape {
             
     }
     /*Redo command pair codes are reversed*/
+    /**
+     * static method Redo:
+     * Pops the redo command stack and executes the respective command according to the code.
+     * code 1: invokes undelete
+     * code 2: invokes delete
+     * code 3: invokes move
+     * code 4: invokes regroup
+     * code 5: invokes ungroup
+     */
     public static void Redo(){
         //System.out.println(recode.toString());
         if (!redo.empty()) {
@@ -1492,16 +1567,21 @@ class Group extends Shape {
     }
 
     private void gdelete() {
-        if (this.getPrevious() == null && this.getNext() != null) {
+        if (this.getPrevious() == null && this.getNext() != null && getCur() != this) {
+            //System.out.println("Did type 1 delete");
             this.getNext().setPrevious(null);
-        } else if (this.getNext() == null && this.getPrevious() != null) {
+        } else if ((this.getNext() == null && this.getPrevious() != null) ||( getCur() == this)) {
+            //System.out.println("Did type 2 delete");
             setCur(this.getPrevious());
         } else if (this.getPrevious() != null) {
+            //System.out.println("Did type 3 delete");
             this.getNext().setPrevious(this.getPrevious());
         } else {
+            //System.out.println("Did type 4 delete");
             setCur(null);
         }
-        if (getCur() == this) {
+        if(getCur() == this){
+            //System.out.println("cur = this, cur = this.previous");
             setCur(this.getPrevious());
         }
     }
@@ -1510,10 +1590,19 @@ class Group extends Shape {
     public void undelete() {
         SaveUndo(this,2);
         if (getCur() == null) {
+            //System.out.println("Counter type 4 delete");
             setCur(this);
-        }   else if (this.getPrevious() == null && this.getNext() != null) {
+        }
+        else if (this.getPrevious() == null && this.getNext() != null) {
+            //System.out.println("Counter type 1 delete");
             this.getNext().setPrevious(this);
-        } else {
+        }
+        else if(this.getPrevious() != null && this.getNext() != null && this.getPrevious() != getCur()){
+            //System.out.println("Counter type 3 delete");
+            this.getNext().setPrevious(this);
+        }
+        else {
+            //System.out.println("Weird");
             setCur(this);
         }
     }

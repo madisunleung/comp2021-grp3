@@ -14,14 +14,6 @@ class LineTest {
         l2.getInfo(2);
     }
 
-    @Test
-    void move() {
-        l1.move(10,10);
-        assertEquals(10, l1.getX1());
-        assertEquals(10, l1.getX2());
-        assertEquals(10, l1.getY1());
-        assertEquals(10, l1.getY2());
-    }
 
     @Test
     void boundingbox() {
