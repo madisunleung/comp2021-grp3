@@ -694,7 +694,7 @@ class Group extends Shape {
     public void getInfo(int n) {
         System.out.println("[Type: Group] " + " [Group name: " + this.getName() + "]");
         //System.out.println("previous: "+ this.previous + " next: "+ this.next + " GP: "+ this.grouparent);
-        for(int i=0; i<s1.length; i++) {
+         for(int i=0; i<s1.length; i++) {
             for (int j = 0; j < n; j++) {
                 System.out.print("\t");
             }
