@@ -485,15 +485,17 @@ public class Shape {
         Shape temp = cur;
         ArrayList<Shape> ret = new ArrayList<>();
         if (n.getSubClass().equals("Group")){
-            Shape[] test = new Shape[1];
-            test[0] = n;
-            for (int i = 0; i< (new Group("test", test)).getS1().length; i++){
-                if ((new Group("test", test)).getS1()[i].getSubClass().equals("Group")){
-                    ret.addAll(subShapes((new Group("test", test)).getS1()[i]));
+            while (temp != null) {
+                Shape parent = temp;
+                if (parent != n) {
+                    while (parent.getGrouparent() != null) {
+                        parent = parent.getGrouparent();
+                    }
+                    if (parent == n) {
+                        ret.add(temp);
+                    }
                 }
-                else{
-                    ret.add((new Group("test", test)).getS1()[i]);
-                }
+                temp = temp.getPrevious();
             }
             return ret;
         }
@@ -546,8 +548,10 @@ public class Shape {
         Shape[] test = new Shape[1];
         test[0] = temp;
         if (temp.getSubClass().equals("Group")){
-            for (int i = 0; i< (new Group("test", test)).getS1().length; i++) {
-                flag = (flag || containspoint((new Group("test", test)).getS1()[i], x, y));
+            ArrayList<Shape> list1 = subShapes(temp);
+            Shape[] groups = list1.toArray(new Shape[list1.size()]);
+            for (int i = 0; i< groups.length; i++) {
+                flag = (flag || containspoint(groups[i], x, y));
             }
             return flag;
         }
