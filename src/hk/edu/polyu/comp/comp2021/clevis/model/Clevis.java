@@ -40,47 +40,39 @@ public class Clevis {
      */
     protected String nregex = "([a-zA-z0-9]+)";
 
+    protected boolean cont = true;
+
+    public Clevis(){}
     /**
      * Clevis, keeps looping to read user input and do the commands until quit is called
      * @param hname     The name of the html log file
      * @param tname     The name of the txt log file
-     * @throws IOException      Exception when there are issues with input/outputs
      */
+
+
 
     public Clevis(String hname, String tname) throws IOException {
         System.out.println("Welcome to CLEVIS!\n" +
                 "Made by group 3\n");
-        boolean cont = true;
-        do {
-            cont = CLI();
-        } while (cont);
-        File folder = new File("outputs");
-        folder.mkdir();
-
-        System.out.println("Creating logs...");
-        File txt = new File("outputs\\" + tname);
-        File html = new File("outputs\\" + hname);
-        BufferedWriter tw = new BufferedWriter(new FileWriter(txt));
-        BufferedWriter hw = new BufferedWriter(new FileWriter(html));
-        for (int i = 0; i < cmds.size(); i++) {
-            tw.write(cmds.get(i) + "\n");
-            hw.write(i + 1 + "\t\t" + cmds.get(i) + "<br>");
+        while(cont){
+            System.out.print("Please enter your command: ");
+            sinput = input.nextLine();
+            cont = CLI(sinput);
         }
-        tw.close();
-        hw.close();
+        writeLogs(hname,tname);
     }
+
+
 
     /**
      * The CLI to read user input, check if the command is valid, and calls corresponding methods to perform actions
      * @return     a boolean, that indicates if the program will continue(true) or teminate(false)
      */
 
-    public boolean CLI() {
-
+    public boolean CLI(String s) {
+        String sinput;
         invalid = false;
-        System.out.print("Please enter your command: ");
-        sinput = input.nextLine();
-        sinput = sinput.trim();
+        sinput = s.trim();
         if (sinput.matches("rectangle " + nregex + " " + fregex + " " + fregex + " " + fregex + " " + fregex)) {        //Rectangle construct, basically complete
             invalid = recConstruct(sinput);
         } else if (sinput.matches("line " + nregex + " " + fregex + " " + fregex + " " + fregex + " " + fregex)) {        //Line construct, basically complete
@@ -142,7 +134,7 @@ public class Clevis {
      * @param sinput      The user input
      * @return              A boolean indicating the command is checked to be invalid(True) or not(False)
      */
-    public boolean recConstruct(String sinput) {
+    private boolean recConstruct(String sinput) {
         System.out.println("Rectangle command recognized");
         String[] cmd = sinput.split(" ");
         if (nameNotUsed(cmd[1])) {
@@ -160,7 +152,7 @@ public class Clevis {
      * @param sinput        The user input
      * @return              A boolean indicating the command is checked to be invalid(True) or not(False)
      */
-    public boolean lineConstruct(String sinput){
+    private boolean lineConstruct(String sinput){
         System.out.println("line command recognized");
         String[] cmd = sinput.split(" ");
         if (nameNotUsed(cmd[1])) {
@@ -276,8 +268,8 @@ public class Clevis {
     /**
      * method del:
      * Calls delete on the shape with the name indicated in the command, if the shape is not found/ it belongs to a group, the command is invalid
-     * @param sinput        The user input
-     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     * @param sinput       The user input
+     * @return             A boolean indicating the command is check to be invalid(True) or not(False)
      */
     public boolean del(String sinput){
         System.out.println("delete command recognized");
@@ -310,9 +302,9 @@ public class Clevis {
     }
 
 
-    /**
-     * method move:
-     * Check if the action is valid, yes then calls the shape to move by the passed in parameters
+     /**
+      * method move:
+      * Check if the action is valid, yes then calls the shape to move by the passed in parameters
      * @param sinput        The user input
      * @return              A boolean indicating the command is check to be invalid(True) or not(False)
      */
@@ -412,6 +404,23 @@ public class Clevis {
             System.out.println("The name ["+name+"] is already used for a shape.");
             return false;
         }
+    }
+
+    public void writeLogs(String hname, String tname) throws IOException {
+        File folder = new File("outputs");
+        folder.mkdir();
+
+        System.out.println("Creating logs...");
+        File txt = new File("outputs\\" + tname);
+        File html = new File("outputs\\" + hname);
+        BufferedWriter tw = new BufferedWriter(new FileWriter(txt));
+        BufferedWriter hw = new BufferedWriter(new FileWriter(html));
+        for (int i = 0; i < cmds.size(); i++) {
+            tw.write(cmds.get(i) + "\n");
+            hw.write(i + 1 + "\t\t" + cmds.get(i) + "<br>");
+        }
+        tw.close();
+        hw.close();
     }
 
 
