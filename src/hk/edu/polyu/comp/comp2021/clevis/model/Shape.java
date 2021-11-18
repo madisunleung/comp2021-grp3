@@ -1,18 +1,29 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
-import org.w3c.dom.css.Rect;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Stack;
+
+
+/**
+ * The shape class, extended into subclasses of shapes (Rectangle, line, circle, square and group)
+ * Each instance of shape contains the name of the shape for base, and all of them contains the property of a doubly linked list node
+ * Along with methods to manipulate the doubly linked list of shapes or the shape themselves individually
+ * Static methods are provided as well to access the doubly linked list easily
+ */
 
 public class Shape {
-    /**                 Basic Settings              **/
     private final String name;
-    Shape next;
-    Shape previous;
-    Shape grouparent = null;
+    private Shape next;
+    private Shape previous;
+    private Shape grouparent = null;
+    
 
-    public static Shape cur=null;
-    public static Shape head= null;
+    private static Shape cur=null;
+    private static Shape head= null;
+
+    /**
+     *
+     * @param name      The name of the shape, each subclass calls super(name) to ensure the name is passed into here and stored
+     */
 
     public Shape(String name) {
         // DON'T FORGET VALIDATION
@@ -22,384 +33,196 @@ public class Shape {
         this.name = name;
     }
 
+    /**
+     * Static method addShape:
+     * called to add a shape into the doubly linked list of shapes,
+     * as shapes are not added automatically into the list upon construction
+     * @param a     The shape object to be added to the list
+     */
+
     public static void addShape(Shape a){
-        if (cur == null){
-            head = a;
+        if (head == null){
+            Shape.head = a;
         }
-        if(cur!=null){
-            cur.next=a;
-            a.previous=cur;
+        if(getCur() !=null){
+            getCur().setNext(a);
+            a.setPrevious(getCur());
         }
-        cur = a;
+        setCur(a);
+        
     }
 
+    /**
+     * Static method getCur:
+     * @return  the cur pointer, which usually points to the latest available constructed shape
+     */
+    public static Shape getCur() {
+        return cur;
+    }
+
+    /**
+     * Static method setCur
+     * @param cur   Updating the cur pointer, when there are operations on the shape such that they are deleted or added
+     */
+    public static void setCur(Shape cur) {
+        Shape.cur = cur;
+    }
+
+    /**                 Basic Settings              **/
+
+
+    /**
+     * method getName:
+     * called directly by any instance of shape
+     * @return  the name of the shape
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * method getInfo:
+     * This method is overridden in every subclass, prints out the information of the shape (Type, name, x,y, etc.)
+     * @param n indicates the indentation, should be 1 for most cases, as the overridden version in group shape would do recursion on it, increasing the indentation value on printing the group members
+     */
     public void getInfo(int n){}
 
+    /**
+     * method getNext:
+     * @return  The shape pointed by the "next" pointer of the current shape
+     */
+    public Shape getNext() {
+        return next;
+    }
+
+    /**
+     * method setNext:
+     * @param next   Updates the "next" pointer of the current shape
+     */
+    public void setNext(Shape next) {
+        this.next = next;
+    }
+
+    /**
+     * method getPrevious:
+     * @return The shape pointed by the "previous" pointer of the current shape
+     */
+    public Shape getPrevious() {
+        return previous;
+    }
+
+    /**
+     * method setPrevious:
+     * @param previous updates the "previous" pointer of the current shape
+     */
+    public void setPrevious(Shape previous) {
+        this.previous = previous;
+    }
+
+    /**
+     * method getGrouparent:
+     * The grouparent pointer indicates if the current shape belongs to a group, if it does it will point to the group shape that grouped them, else the grouparent is set to null
+     * @return the group parent shape of the current shape, null if the current shape doesn't belong to a group
+     */
+    public Shape getGrouparent() {
+        return grouparent;
+    }
+
+    /**
+     * method setGrouparent:
+     * @param grouparent updates the group parent pointer of the current shape, when the current shape is involved grouping related operations such as group constructing and ungrouping
+     */
+    public void setGrouparent(Shape grouparent) {
+        this.grouparent = grouparent;
+    }
+
+    /**
+     * method move:
+     * "moves" the shape by adding the parameters passed into the method to the x and y coordinates of the shape respectively
+     * This method is overridden in every subclass of shape as the moving operation of each type of shape may slightly alter from each other
+     * In group, the method is recursed into the grouped shapes so every group member element is moved
+     * @param x     Moves the x-coordinate by this value (add it to x)
+     * @param y     Moves the y-coordinate by this value (add it to y)
+     */
     public void move(double x, double y){}
 
+    /**
+     * method boundingbox:
+     * This method is overridden in every subclass of shape, as the way to obtain the boundingbox of each shape is different from others
+     * Recursed in group shapes, as it will obtain the bounding boxes returned by each group member shape and compare them to find the bounding box that includes all shapes in the group
+     * @return      a double type array, in the indexes: 0 is the x, 1 is the y, 2 is the width, 3 is the height of the bounding box
+     */
     public double[] boundingbox(){
         return new double[4];
     }
 
+    /**
+     * method ungroup:
+     * The method is overridden in Group type subclass, it removes the group shape from the doubly linked list
+     * and set all the member shape's grouparent pointer to null as they are ungrouped
+     */
     public void ungroup(){}
 
+    /**
+     * method regroup:
+     * The method is overridden in Group type subclass, it "redo"s the ungroup operation by recovering the group
+     * and the member shape's grouparent pointer will point to the group again
+     */
+    public void regroup(){}
+
+    /**
+     * static method findAShape:
+     * Takes a name as a parameter, returns the shape with the name if it exists in the doubly linked list
+     * @param name      The name of the shape to find
+     * @return          returns the shape object with the name, null if there is no such shape with the name
+     */
     public static Shape findAShape(String name) {        //finds and returns the shape with a name
-        Shape temp = cur;
+        Shape temp = getCur();
         while (temp != null) {
-            if (temp.name.equals(name)) {
+            if (temp.getName().equals(name)) {
                 break;
             }
-            temp = temp.previous;
+            temp = temp.getPrevious();
         }
         return temp;
     }
 
+    /**
+     * method belongToGroup:
+     * @return The grouparent pointer of the shape called this method
+     */
     public Shape belongToGroup(){
-        return grouparent;
+        return getGrouparent();
     }
     /**-----------------[Intersect related methods]------------------------------------------------------------**/
-    public static boolean intersect(Shape n1, Shape n2){
-        ArrayList<Shape> list1 = subShapes(n1);
-        ArrayList<Shape> list2 = subShapes(n2);
-        Shape[] temp1 = list1.toArray(new Shape[list1.size()]);
-        Shape[] temp2 = list2.toArray(new Shape[list2.size()]);
-
-        for(int i=0; i<temp1.length; i++){
-            for(int j=0; j<temp2.length; j++){
-                if (containspoint(temp1[i], temp2[j])){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean containspoint(Shape temp, Shape temp1){
-        boolean flag = false;
-        Line p1, p2, p3, p4;
-        if (temp instanceof Square){
-            temp = new Rectangle("test", ((Square) temp).x, ((Square) temp).y, ((Square) temp).l, ((Square) temp).l);
-        }
-        if (temp instanceof Rectangle){
-            p1 = new Line("p1", ((Rectangle) temp).x, ((Rectangle) temp).y, ((Rectangle) temp).x+ ((Rectangle) temp).w, ((Rectangle) temp).y);
-            p2 = new Line("p2", ((Rectangle) temp).x, ((Rectangle) temp).y- ((Rectangle) temp).h, ((Rectangle) temp).x+ ((Rectangle) temp).w, ((Rectangle) temp).y- ((Rectangle) temp).h);
-            p3 = new Line("p3", ((Rectangle) temp).x, ((Rectangle) temp).y, ((Rectangle) temp).x, ((Rectangle) temp).y- ((Rectangle) temp).h);
-            p4 = new Line("p4", ((Rectangle) temp).x+ ((Rectangle) temp).w, ((Rectangle) temp).y, ((Rectangle) temp).x+ ((Rectangle) temp).w, ((Rectangle) temp).y- ((Rectangle) temp).h);
-            flag = (containspoint(p1, temp1) || containspoint(p2, temp1) || containspoint(p3, temp1) || containspoint(p4, temp1));
-        }
-        if (temp1 instanceof Square){
-            temp1 = new Rectangle("test", ((Square) temp1).x, ((Square) temp1).y, ((Square) temp1).l, ((Square) temp1).l);
-        }
-        if (temp1 instanceof Rectangle){
-            p1 = new Line("p1", ((Rectangle) temp1).x, ((Rectangle) temp1).y, ((Rectangle) temp1).x+ ((Rectangle) temp1).w, ((Rectangle) temp1).y);
-            p2 = new Line("p2", ((Rectangle) temp1).x, ((Rectangle) temp1).y- ((Rectangle) temp1).h, ((Rectangle) temp1).x+ ((Rectangle) temp1).w, ((Rectangle) temp1).y- ((Rectangle) temp1).h);
-            p3 = new Line("p3", ((Rectangle) temp1).x, ((Rectangle) temp1).y, ((Rectangle) temp1).x, ((Rectangle) temp1).y- ((Rectangle) temp1).h);
-            p4 = new Line("p4", ((Rectangle) temp1).x+ ((Rectangle) temp1).w, ((Rectangle) temp1).y, ((Rectangle) temp1).x+ ((Rectangle) temp1).w, ((Rectangle) temp1).y- ((Rectangle) temp1).h);
-            flag = (containspoint(temp, p1) || containspoint(temp, p2) || containspoint(temp, p3) || containspoint(temp, p4));
-        }
-        if (temp instanceof Circle && temp1 instanceof Circle){
-            flag = check2circle((Circle) temp, (Circle) temp1);
-        }
-        else if (temp instanceof Circle && temp1 instanceof Line){
-            flag = checkCircleLine((Circle) temp, (Line) temp1);
-        }
-        else if (temp instanceof Line && temp1 instanceof Circle){
-            flag = checkCircleLine((Circle) temp1, (Line) temp);
-        }
-        else if (temp instanceof Line && temp1 instanceof Line){
-            flag = check2Line((Line) temp, (Line) temp1);
-        }
-        return flag;
-    }
-
-    public static boolean check2circle(Circle n1, Circle n2){
-        double num = pythegorean(n1.x, n1.y, n2.x, n2.y);
-        if (num < Math.abs(n1.r - n2.r) || num > (n1.r + n2.r)){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-    public static boolean checkCircleLine(Circle n1, Line n2){
-        double x1Intersect, y1Intersect, x2Intersect, y2Intersect;
-        if (Math.abs(n2.x2 - n2.x1) == 0){
-            if (Math.abs(n2.x1 - n1.x) > n1.r){
-                return false;
-            }
-            else if (Math.abs(n2.x1 - n1.x) == n1.r){
-                x1Intersect = n2.x1;
-                y1Intersect = n1.y;
-                if (Math.abs(pythegorean(n2.x1, n2.y1, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
-                        || Math.abs(pythegorean(n2.x2, n2.y2, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
-                    return false;
-                }
-                return true;
-            }
-            else{
-                x1Intersect = n2.x1;
-                x2Intersect = n2.x1;
-                double a = 1;
-                double b = -2*n1.y;
-                double c = Math.pow(x1Intersect-n1.x,2) + Math.pow(n1.y,2) - Math.pow(n1.r,2);
-                y1Intersect = (-b + Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
-                y2Intersect = (-b - Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
-                if (Math.abs(pythegorean(n2.x1, n2.y1, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
-                        || Math.abs(pythegorean(n2.x2, n2.y2, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
-                    if (Math.abs(pythegorean(n2.x1, n2.y1, x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
-                            || Math.abs(pythegorean(n2.x2, n2.y2, x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        else{
-            double m = (n2.y2 - n2.y1) / (n2.x2 - n2.x1);
-            double temp = n2.y1 - m*n2.x1 - n1.y;
-            double a = Math.pow(m,2) + 1;
-            double b = 2*m*temp - 2*n1.x;
-            double c = Math.pow(n1.x,2) + Math.pow(temp,2) - Math.pow(n1.r,2);
-            double determinant = Math.pow(b,2) - (4*a*c);
-            if (determinant < 0){
-                return false;
-            }
-            else if (determinant == 0){
-                x1Intersect = (-b) / (2*a);
-                y1Intersect = m*x1Intersect + n2.y1 - m*n2.x1;
-                if (Math.abs(pythegorean(n1.x, n1.y, x1Intersect, y1Intersect) - n1.r) < 0.00001){
-                    return true;
-                }
-                else{
-                    return false;
-                }
-            }
-            else{
-                x1Intersect = (-b + Math.sqrt(determinant)) / (2*a);
-                y1Intersect = m*x1Intersect + n2.y1 - m*n2.x1;
-                x2Intersect = (-b - Math.sqrt(determinant)) / (2*a);
-                y2Intersect = m*x2Intersect + n2.y1 - m*n2.x1;
-                if (Math.abs(pythegorean(n2.x1, n2.y1, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
-                || Math.abs(pythegorean(n2.x2, n2.y2, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
-                    if (Math.abs(pythegorean(n2.x1, n2.y1, x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
-                            || Math.abs(pythegorean(n2.x2, n2.y2, x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-    }
-    public static boolean check2Line (Line n1, Line n2){
-        double xIntersect, yIntersect;
-        if (n1.x2-n1.x1 == 0 && n2.x2-n2.x1 == 0){
-            if (n1.x1 != n2.x1){
-                return false;
-            }
-            else if(Math.abs(n1.y1 - n2.y1) > Math.abs(n2.y1 - n2.y2) || Math.abs(n1.y1 - n2.y2) > Math.abs(n2.y1 - n2.y2)){
-                if(Math.abs(n1.y2 - n2.y1) > Math.abs(n2.y1 - n2.y2) || Math.abs(n1.y2 - n2.y2) > Math.abs(n2.y1 - n2.y2)){
-                    return false;
-                }
-            }
-            return true;
-        }
-        if (n1.x2-n1.x1 == 0){
-            xIntersect = n1.x1;
-            double m2 = (n2.y2-n2.y1)/(n2.x2-n2.x1);
-            yIntersect = n2.y1-m2*n2.x1 - (-m2*xIntersect);
-            if(Math.abs(yIntersect-n1.y1) > Math.abs(n1.y1-n1.y2) || Math.abs(yIntersect-n1.y2) > Math.abs(n1.y1-n1.y2)){
-                return false;
-            }
-            else if(pythegorean(xIntersect,yIntersect,n2.x1,n2.y1) > pythegorean(n2.x1,n2.y1,n2.x2,n2.y2)
-                || pythegorean(xIntersect,yIntersect,n2.x2,n2.y2) > pythegorean(n2.x1,n2.y1,n2.x2,n2.y2)){
-                return false;
-            }
-            else{
-                return true;
-            }
-        }
-        else if (n2.x2-n2.x1 == 0){
-            xIntersect = n2.x1;
-            double m = (n1.y2-n1.y1)/(n1.x2-n1.x1);
-            yIntersect = n1.y1-m*n1.x1 - (-m*xIntersect);
-            if(Math.abs(yIntersect-n2.y1) > Math.abs(n2.y1-n2.y2) || Math.abs(yIntersect-n2.y2) > Math.abs(n2.y1-n2.y2)){
-                return false;
-            }
-            else if(pythegorean(xIntersect,yIntersect,n1.x1,n1.y1) > pythegorean(n1.x1,n1.y1,n1.x2,n1.y2)
-                    || pythegorean(xIntersect,yIntersect,n1.x2,n1.y2) > pythegorean(n1.x1,n1.y1,n1.x2,n1.y2)){
-                return false;
-            }
-            else{
-                return true;
-            }
-        }
-        else{
-            double m = (n1.y2-n1.y1)/(n1.x2-n1.x1); //slope
-            double m2 = (n2.y2-n2.y1)/(n2.x2-n2.x1); //another slope
-            double a = -m, b = 1, c = n1.y1-m*n1.x1;    //ax + by = c
-            double d = -m2, e = 1, f = n2.y1-m2*n2.x1;  //dx + ey = f
-            //solving 2 equations with 2 unknowns (with matrix)
-            double temp = b*d - a*e;
-            if (m == m2){
-                if (c != f){
-                    return false;
-                }
-                else if(pythegorean(n1.x1, n1.y1, n2.x1, n2.y1) > pythegorean(n2.x1, n2.y1, n2.x2, n2.y2) ||
-                        pythegorean(n1.x1, n1.y1, n2.x2, n2.y2) > pythegorean(n2.x1, n2.y1, n2.x2, n2.y2)){
-                    if(pythegorean(n1.x2, n1.y2, n2.x1, n2.y1) > pythegorean(n2.x1, n2.y1, n2.x2, n2.y2) ||
-                            pythegorean(n1.x2, n1.y2, n2.x2, n2.y2) > pythegorean(n2.x1, n2.y1, n2.x2, n2.y2)){
-                        return false;
-                    }
-                }
-                return true;
-            }
-            xIntersect = (b*f - c*e) / temp;
-            yIntersect = (c*d - a*f) / temp;
-            if(pythegorean(xIntersect,yIntersect,n1.x1,n1.y1) > pythegorean(n1.x1,n1.y1,n1.x2,n1.y2)
-                    || pythegorean(xIntersect,yIntersect,n1.x2,n1.y2) > pythegorean(n1.x1,n1.y1,n1.x2,n1.y2)
-                    || pythegorean(xIntersect,yIntersect,n2.x1,n2.y1) > pythegorean(n2.x1,n2.y1,n2.x2,n2.y2)
-                    || pythegorean(xIntersect,yIntersect,n2.x2,n2.y2) > pythegorean(n2.x1,n2.y1,n2.x2,n2.y2)){
-                return false;
-            }
-            else{
-                return true;
-            }
-        }
-    }
-    public static ArrayList<Shape> subShapes(Shape n){
+    /* public static boolean intersect(Shape n1, Shape n2){
+        Shape[] temp1 = new subShapes(n1);
+        Shape[] temp2 = new subShapes(n2);
         Shape temp = cur;
-        ArrayList<Shape> ret = new ArrayList<>();
-        if (n instanceof Group){
-            for (int i=0; i<((Group) n).s1.length; i++){
-                if (((Group) n).s1[i] instanceof Group){
-                    ret.addAll(subShapes(((Group) n).s1[i]));
-                }
-                else{
-                    ret.add(((Group) n).s1[i]);
-                }
-            }
-            return ret;
-        }
-        else{
-            ret.add(n);
-            return ret;
-        }
-    }
-    /**-----------------[pickandmove related methods]------------------------------------------------------------**/
-    public static void pickandmove(double x, double y, double dx, double dy){
-        Shape temp = cur;
-        while (temp != null) {
-            if (containspoint(temp, x, y)) {
-                break;
+        while(temp != null){
+            if(temp instanceof Group == false) {
+                temp.getInfo(1);
             }
             temp = temp.previous;
         }
-        if (temp == null){
-            System.out.println("There isn't any shape satisfying the parameters.");
-            return;
-        }
-        else{
-            while (temp.grouparent != null){
-                temp = temp.grouparent;
-            }
-            temp.move(dx, dy);
-        }
+        return true;
     }
 
-    public static boolean containspoint(Shape temp, double x, double y){
-        Shape temp2 = new Shape("test");
-        boolean flag = false;
-        if (temp instanceof Group){
-            for (int i=0; i< ((Group) temp).s1.length; i++) {
-                flag = (flag || containspoint(((Group) temp).s1[i], x, y));
-            }
-            return flag;
-        }
-        else if (temp instanceof Circle){
-            flag = minDistance(((Circle) temp).x, ((Circle) temp).y, x, y, ((Circle) temp).r);
-        }
-        else if (temp instanceof Rectangle){
-            temp2 = (Rectangle) temp;
-        }
-        else if (temp instanceof Square){
-            temp2 = new Rectangle("test", ((Square) temp).x, ((Square) temp).y, ((Square) temp).l, ((Square) temp).l);
-        }
-        else if (temp instanceof Line){
-            flag = minDistance(((Line) temp).x1, ((Line) temp).y1, ((Line) temp).x2, ((Line) temp).y2, x, y);
-        }
-        if (temp2 instanceof Rectangle){
-            Line p1 = new Line("p1", ((Rectangle) temp2).x, ((Rectangle) temp2).y, ((Rectangle) temp2).x+ ((Rectangle) temp2).w, ((Rectangle) temp2).y);
-            Line p2 = new Line("p2", ((Rectangle) temp2).x, ((Rectangle) temp2).y- ((Rectangle) temp2).h, ((Rectangle) temp2).x+ ((Rectangle) temp2).w, ((Rectangle) temp2).y- ((Rectangle) temp2).h);
-            Line p3 = new Line("p3", ((Rectangle) temp2).x, ((Rectangle) temp2).y, ((Rectangle) temp2).x, ((Rectangle) temp2).y- ((Rectangle) temp2).h);
-            Line p4 = new Line("p4", ((Rectangle) temp2).x+ ((Rectangle) temp2).w, ((Rectangle) temp2).y, ((Rectangle) temp2).x+ ((Rectangle) temp2).w, ((Rectangle) temp2).y- ((Rectangle) temp2).h);
-            flag = (containspoint(p1, x, y) || containspoint(p2, x, y) || containspoint(p3, x, y) || containspoint(p4, x, y));
-        }
-        return flag;
-    }
+    public static Shape[] subShapes(Shape n){
 
-    //Circle minDistance
-    public static boolean minDistance(double x, double y, double dx, double dy, double r){
-        double distance = pythegorean(x, y, dx, dy);
-        if (Math.abs(distance - r) < 0.05){
-            return true;
-        }
-        return false;
-    }
-
-    //Rectangle, Square and Line minDistance
-    public static boolean minDistance(double x1, double y1, double x2, double y2, double dx, double dy){
-        double xIntersect, yIntersect, distance;
-        if (y2-y1 == 0){
-            xIntersect = dx;
-            yIntersect = y1;
-        }
-        else if (x2-x1 == 0){
-            xIntersect = x1;
-            yIntersect = dy;
-        }
-        else{
-            double m = (y2-y1)/(x2-x1); //slope
-            double m2 = -1 / m; //perpendicular to slope
-            double a = -m, b = 1, c = y1-m*x1;    //ax + by = c
-            double d = -m2, e = 1, f = dy-m2*dx;  //dx + ey = f
-            //solving 2 equations with 2 unknowns (with matrix)
-            double temp = b*d - a*e;
-            xIntersect = (b*f - c*e) / temp;
-            yIntersect = (c*d - a*f) / temp;
-        }
-        if (pythegorean(xIntersect,yIntersect,x2,y2) > pythegorean(x1,y1,x2,y2) || pythegorean(xIntersect,yIntersect,x1,y1) > pythegorean(x1,y1,x2,y2)){
-            if(pythegorean(xIntersect,yIntersect,x2,y2) > pythegorean(xIntersect,yIntersect,x1,y1)){
-                distance = pythegorean(dx,dy,x1,y1);
-            }
-            else{
-                distance = pythegorean(dx,dy,x2,y2);
-            }
-        }
-        else{
-            distance = pythegorean(dx,dy,xIntersect,yIntersect);
-        }
-        if (distance < 0.05){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-    public static double pythegorean(double x, double y, double dx, double dy){
-        double xDif = x-dx;
-        double yDif = y-dy;
-        return Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
-    }
+    }*/
     /**-----------------[Delete related methods]------------------------------------------------------------**/
 
+    /**
+     * static method delete
+     * takes a name as the parameter, finds and deletes the shape if the shape exists in the doubly linked list and not a member of a group.
+     * @param name  The name of the shape to be deleted
+     * @return      nothing
+     */
     public static boolean delete(String name){     //delete function prototype part 1
         Shape target = findAShape(name);
         if(target != null) {
-            if(target.grouparent == null) {
+            if(target.getGrouparent() == null) {
                 target.delete();
                 return false;
             }
@@ -414,64 +237,227 @@ public class Shape {
         }
     }
 
-    public void delete() {      //delete function prototype part 2 (v2)
-        if (this.previous == null && this.next != null) {
-            this.next.previous = null;
-        } else if (this.next == null && this.previous != null) {
-            cur = this.previous;
-        } else if (this.previous != null) {
-            this.next.previous = this.previous;
+    /**
+     * method delete:
+     * deletes the shape that called this method
+     */
+    public void delete() {      //delete function prototype part 2
+        SaveUndo(this,1);
+        if (this.getPrevious() == null && this.getNext() != null) {
+            this.getNext().setPrevious(null);
+        } else if (this.getNext() == null && this.getPrevious() != null) {
+            setCur(this.getPrevious());
+        } else if (this.getPrevious() != null) {
+            this.getNext().setPrevious(this.getPrevious());
         } else {
-            cur = null;
+            setCur(null);
         }
-        if(cur == this){
-            cur = this.previous;
+        if(getCur() == this){
+            setCur(this.getPrevious());
         }
     }
 
+    /**
+     * method undelete:
+     * "undo"s the delete on a shape that is deleted
+     */
+    public void undelete() {
+        SaveUndo(this,2);
+        if (getCur() == null) {
+            setCur(this);
+        }   else if (this.getPrevious() == null && this.getNext() != null) {
+            this.getNext().setPrevious(this);
+        } else {
+            setCur(this);
+        }
+    }
+
+    
+
     /**---------------[List related methods]------------------------------------------------------------**/
 
-    public static void ListTest(){      //Lists every single shape, from the newest to the oldest
-        Shape temp = cur;
+    /**
+     * static method List
+     * Lists every available shape by the decreasing Z-order,
+     * by looping through the doubly linked list from cur(usually the tail) to head
+     * and calling getInfo on each shape
+     * group member shapes will not be listed out twice
+     */
+    public static void List(){      //Lists every single shape, from the newest to the oldest
+        Shape temp = getCur();
         while(temp != null){
             if(temp.belongToGroup() == null) {
                 temp.getInfo(1);
             }
-            temp = temp.previous;
+            temp = temp.getPrevious();
         }
     }
+
+    /**
+     * A Method made for debugging
+     */
     public static void ListFromHead(){   //might have to use this in redo steps, if you are having questions please ask Leo
         Shape temp = head;
         while (temp != null){
             temp.getInfo(1);
-            temp = temp.next;
+            temp = temp.getNext();
         }
     }
+    /**---------------[Undo related methods]------------------------------------------------------------*/
+    protected static Stack<Shape> undo = new Stack<Shape>();
+    protected static Stack<Integer> code = new Stack<Integer>();
+    protected static Stack<Double> movx = new Stack<Double>();
+    protected static Stack<Double> movy = new Stack<Double>();
+    protected static Stack<Shape> redo = new Stack<Shape>();
+    protected static Stack<Integer> recode = new Stack<Integer>();
+    protected static Stack<Double> removx = new Stack<Double>();
+    protected static Stack<Double> removy = new Stack<Double>();
+    /**undoable methods:
+     * re-add/delete 1,2
+     * move 3
+     * re-group/ungroup 4,5
+     */
+    public static void SaveUndo(Shape target,int number){//all the above methods use this to save to the undo list
+        undo.push(target);
+        code.push(number);
+    }
+    public static void SaveMove(Double x,Double y){//save the reverse action of the move
+        movx.push(-x);
+        movy.push(-y);
+    }
+    public static void PopUndo(){
+        undo.pop();
+        code.pop();
+    }
+    public static void PopMove(){
+        movx.pop();
+        movy.pop();
+    }
+    public static void ClearRedo(){
+        redo.clear();
+        recode.clear();
+    }
+    public static void SaveRedo(Shape target,int number){//same implementation for redo
+        redo.push(target);
+        recode.push(number);
+    }
+    public static void SavereMove(Double x,Double y){//use the reversed save of the move
+        removx.push(x);
+        removy.push(y);
+    }
+
+    public static void Undos(){
+        //System.out.println(code.toString());
+        if (!undo.empty()) {
+            Shape target = undo.pop();
+            switch(code.pop()){
+                case 1:
+                    target.undelete();
+                    SaveRedo(undo.pop(),code.pop());
+                    break;
+                case 2:
+                    target.delete();
+                    SaveRedo(undo.pop(),code.pop());
+                    break;
+                case 3:
+                    target.move(movx.pop(),movy.pop());
+                    SaveRedo(undo.pop(),code.pop());
+                    SavereMove(movx.pop(),movy.pop());
+                    break;
+                case 4:
+                    target.regroup();
+                    SaveRedo(undo.pop(),code.pop());
+                    break;
+                case 5:
+                    target.ungroup();
+                    SaveRedo(undo.pop(),code.pop());
+                    break;
+            }
+        }
+            
+    }
+    /*Redo command pair codes are reversed*/
+    public static void Redo(){
+        //System.out.println(recode.toString());
+        if (!redo.empty()) {
+            Shape target = redo.pop();
+            switch(recode.pop()){
+                case 1:
+                    target.undelete();
+                    break;
+                case 2:
+                    target.delete();
+                    break;
+                case 3:
+                    target.move(removx.pop(),removy.pop());
+                    break;
+                case 4:
+                    target.regroup();
+                    break;
+                case 5:
+                    target.ungroup();
+                    break;
+            }
+        }
+            
+    }
+
 
 }
 
 
 //===============[RECTANGLE CLASS]==========================================================================
 
-
+/**
+ * Rectangle class shape, extended from Shape class
+ */
 class Rectangle extends Shape {
-    public double x, y, w, h;
+    /**
+     * The 4 parameters needed for constructing a rectangle
+     */
+    protected double x;
+    /**
+     *
+     */
+    protected double y;
+    /**
+     *
+     */
+    protected double w;
+    /**
+     *
+     */
+    protected double h;
 
+    /**
+     *
+     * @param name      The name of the rectangle
+     * @param x         The x-coordinate of the top-left corner of the rectangle
+     * @param y         The y-coordinate of the top-left corner of the rectangle
+     * @param w         The width of the rectangle
+     * @param h         The height of the rectangle
+     */
     Rectangle(String name, double x, double y, double w, double h) {
         super(name);
+        SaveUndo(this,2);
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
     }
+    @Override
     public void getInfo(int n){
         System.out.println("[Shape type: Rectangle] " + " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [width: "+String.format("%.2f",w)+"]  [height: "+String.format("%.2f",h)+"]");
     }
+    @Override
     public void move(double x, double y){
+        SaveUndo(this, 3);
+        SaveMove(x, y);
         this.x = this.x + x;
         this.y = this.y + y;
     }
 
+    @Override
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x;
@@ -486,28 +472,61 @@ class Rectangle extends Shape {
 
 //===============[LINE CLASS]======================================================================================
 
+/**
+ * Line class shape, extended from Shape class
+ */
 
 class Line extends Shape {
-    public double x1, y1, x2, y2;
+    /**
+     * The variables of a line, 2 sets of x,y coordinates to indicate the two points that forms a line
+     */
+    protected double x1;
+    /**
+     *
+     */
+    protected double y1;
+    /**
+     *
+     */
+    protected double x2;
+    /**
+     *
+     */
+    protected double y2;
+
+    /**
+     *
+     * @param name      The name of the line shape
+     * @param x1        The x-coordinate of the first point
+     * @param y1        The y-coordinate of the first point
+     * @param x2        The x-coordinate of the second point
+     * @param y2        The y-coordinate of the second point
+     */
 
     Line(String name, double x1, double y1, double x2, double y2) {
         super(name);
+        SaveUndo(this,2);
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;
         this.y2 = y2;
     }
+    @Override
     public void getInfo(int n){
         System.out.println("[Shape type: Line] "+ "  [Shape name: "+this.getName()+"]  [x-coordinate 1: "+ String.format("%.2f",x1) + "]  [y-coordinate 1: "+String.format("%.2f",y1)+"]  [x-coordinate 2: "+String.format("%.2f",x2)+"]  [y-coordinate 2: "+String.format("%.2f",y2)+"]");
     }
 
+    @Override
     public void move(double x, double y){
+        SaveUndo(this, 3);
+        SaveMove(x, y);
         this.x1 = this.x1 + x;
         this.x2 = this.x2 + x;
         this.y1 = this.y1 + y;
         this.y2 = this.y2 + y;
     }
 
+    @Override
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x1 < this.x2 ? this.x1 : this.x2; //smaller x
@@ -523,23 +542,55 @@ class Line extends Shape {
 //======================[CIRCLE CLASS]=============================================================================
 
 
-class Circle extends Shape {
-    public double x, y, r;
+/**
+ *
+ * Circle class Shape, extended from class Shape
+ *
+ */
+
+class  Circle extends Shape {
+
+    /**
+     * The 3 parameters necessary for a circle
+     */
+    protected double x;
+    /**
+     *
+     */
+    protected double y;
+    /**
+     *
+     */
+    protected double r;
+
+    /**
+     *
+     * @param name      The name of the shape
+     * @param x         The x-coordinate of the circle's centre
+     * @param y         The y-coordinate of the circle's centre
+     * @param r         The radius of the circle
+     */
 
     Circle(String name, double x, double y, double r) {
         super(name);
+        SaveUndo(this,2);
         this.x = x;
         this.y = y;
         this.r = r;
     }
+    @Override
     public void getInfo(int n){
         System.out.println("[Shape type: Circle] "+ " [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [radius: "+String.format("%.2f",r)+"]");
     }
+    @Override
     public void move(double x, double y){
+        SaveUndo(this, 3);
+        SaveMove(x, y);
         this.x = this.x + x;
         this.y = this.y + y;
     }
 
+    @Override
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x - this.r; //upper left corner x
@@ -554,24 +605,51 @@ class Circle extends Shape {
 
 //==================[SQUARE CLASS]=================================================================================
 
-
+/**
+ * Square class shape, extended from class Shape
+ */
 class Square extends Shape {
-    public double x, y, l;
+    /**
+     * The 3 parameters needed for a square
+     */
+    protected double x;
+    /**
+     *
+     */
+    protected double y;
+    /**
+     *
+     */
+    protected double l;
+
+    /**
+     *
+     * @param name      The name of the shape
+     * @param x         The x-coordinate of the square's top left corner
+     * @param y         The y-coordinate of the square's top left corner
+     * @param l         The side length of the square
+     */
 
     Square(String name, double x, double y, double l) {
         super(name);
+        SaveUndo(this,2);
         this.x = x;
         this.y = y;
         this.l = l;
     }
+    @Override
     public void getInfo(int n){
         System.out.println("[Shape type: Square] "+" [Shape name: "+this.getName()+"]  [x-coordinate: "+ String.format("%.2f",x) + "]  [y-coordinate: "+String.format("%.2f",y)+"]  [side length: "+String.format("%.2f",l)+"]");
     }
+    @Override
     public void move(double x, double y){
+        SaveUndo(this, 3);
+        SaveMove(x, y);
         this.x = this.x + x;
         this.y = this.y + y;
     }
 
+    @Override
     public double[] boundingbox() {
         double[] boxArr = new double[4];
         boxArr[0] = this.x;
@@ -585,17 +663,34 @@ class Square extends Shape {
 
 //==================[GROUP CLASS]=====================================================================
 
+/**
+ * Group class, it is not exactly a shape itself
+ * This class exists to facilitate the grouping of the normal shapes,
+ * and the functions to be passed/recursed on the grouped shapes (e.g. moving a whole group of shapes)
+ */
+
 class Group extends Shape {
-    public Shape[] s1;
+    /**
+     * The array to point to all existing children shapes that are commanded to be grouped together
+     */
+    protected Shape[] s1;
+
+    /**
+     *
+     * @param name      The name of the group
+     * @param s1        The array of Shapes that are supposed to be grouped
+     */
 
     Group(String name, Shape[] s1) {
         super(name);
+        SaveUndo(this,5);
         this.s1 = s1;
         for (int i=0; i<s1.length; i++){
-            this.s1[i].grouparent = this;
+            this.s1[i].setGrouparent(this);
         }
     }
 
+    @Override
     public void getInfo(int n) {
         System.out.println("[Type: Group] " + " [Group name: " + this.getName() + "]");
         //System.out.println("previous: "+ this.previous + " next: "+ this.next + " GP: "+ this.grouparent);
@@ -607,6 +702,7 @@ class Group extends Shape {
         }
     }
 
+    @Override
     public double[] boundingbox() {
         double[] s1boxArr = new double[4];
         int i, j;
@@ -656,42 +752,70 @@ class Group extends Shape {
         return result;
     }
 
+    @Override
     public void delete() {
-        if (this.grouparent == null) {
-            for (int i=0; i<s1.length; i++){
-                s1[i].delete();
-            }
+        SaveUndo(this,1);
+        if (this.getGrouparent() == null) {
             gdelete();
         } else {
             System.out.println("Deleting a component shape of a group is invalid!");
         }
     }
 
+    @Override
     public void move(double x, double y) {
+        SaveUndo(this,3);
+        SaveMove(x,y);
         for (int i=0; i<s1.length; i++){
             s1[i].move(x, y);
+            PopUndo();
+            PopMove();
         }
     }
 
+    @Override
     public void ungroup() {
+        SaveUndo(this, 4);
         for (int i=0; i<s1.length; i++){
-            s1[i].grouparent = null;
+            s1[i].setGrouparent(null);
         }
         gdelete();
     }
 
     private void gdelete() {
-        if (this.previous == null && this.next != null) {
-            this.next.previous = null;
-        } else if (this.next == null && this.previous != null) {
-            cur = this.previous;
-        } else if (this.previous != null) {
-            this.next.previous = this.previous;
+        if (this.getPrevious() == null && this.getNext() != null) {
+            this.getNext().setPrevious(null);
+        } else if (this.getNext() == null && this.getPrevious() != null) {
+            setCur(this.getPrevious());
+        } else if (this.getPrevious() != null) {
+            this.getNext().setPrevious(this.getPrevious());
         } else {
-            cur = null;
+            setCur(null);
         }
-        if (cur == this) {
-            cur = this.previous;
+        if (getCur() == this) {
+            setCur(this.getPrevious());
+        }
+    }
+
+    @Override
+    public void undelete() {
+        SaveUndo(this,2);
+        if (getCur() == null) {
+            setCur(this);
+        }   else if (this.getPrevious() == null && this.getNext() != null) {
+            this.getNext().setPrevious(this);
+        } else {
+            setCur(this);
+        }
+    }
+
+    @Override
+    public void regroup() {
+        SaveUndo(this, 5);
+        undelete();
+        PopUndo();
+        for (int i=0; i<s1.length; i++){
+            this.s1[i].setGrouparent(this);
         }
     }
 

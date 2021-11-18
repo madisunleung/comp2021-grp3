@@ -1,14 +1,16 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
-/*
-import org.junit.Test;
 
-public class ClevisTest {
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class ClevisTest {
 
     @Test
-    public void testClevisConstructor(){
-        Clevis clevis = new Clevis();
-        assert true;
+    void nameNotUsed() {
     }
 
+    @Test
+    void main() {
+    }
 }
-*/
