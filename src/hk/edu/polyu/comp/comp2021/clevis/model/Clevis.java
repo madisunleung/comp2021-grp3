@@ -135,9 +135,24 @@ public class Clevis {
             }
             else if(sinput.matches("pick-and-move "+fregex+" "+fregex+" "+fregex+" "+fregex)){
                 System.out.println("pick-and-move command recognized");
+                String[] cmd = sinput.split(" ");
+                Shape.pickandmove(Double.parseDouble(cmd[1]), Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]));
             }
             else if(sinput.matches("intersect "+nregex+" "+nregex)){
                 System.out.println("intersect command recognized");
+                String[] cmd = sinput.split(" ");
+                Shape temp = Shape.findAShape(cmd[1]);
+                Shape temp2 = Shape.findAShape(cmd[2]);
+                if (temp == null || temp2 == null){
+                    System.out.println("At least one of the shapes are not found");
+                    invalid = true;
+                }
+                else if (Shape.intersect(temp, temp2)){
+                    System.out.println("Shape " + cmd[1] + " and Shape " + cmd[2] + " intersects each other.");
+                }
+                else{
+                    System.out.println("Shape " + cmd[1] + " and Shape " + cmd[2] + " does not intersect with each other.");
+                }
             }
             else if(sinput.matches("list "+nregex)){                                                //List a single shape, basically complete
                 System.out.println("list command recognized");

@@ -1,7 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
 import org.w3c.dom.css.Rect;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Shape {
@@ -62,22 +62,338 @@ public class Shape {
         return grouparent;
     }
     /**-----------------[Intersect related methods]------------------------------------------------------------**/
-    /* public static boolean intersect(Shape n1, Shape n2){
-        Shape[] temp1 = new subShapes(n1);
-        Shape[] temp2 = new subShapes(n2);
+    public static boolean intersect(Shape n1, Shape n2){
+        ArrayList<Shape> list1 = subShapes(n1);
+        ArrayList<Shape> list2 = subShapes(n2);
+        Shape[] temp1 = list1.toArray(new Shape[list1.size()]);
+        Shape[] temp2 = list2.toArray(new Shape[list2.size()]);
+
+        for(int i=0; i<temp1.length; i++){
+            for(int j=0; j<temp2.length; j++){
+                if (containspoint(temp1[i], temp2[j])){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean containspoint(Shape temp, Shape temp1){
+        boolean flag = false;
+        Line p1, p2, p3, p4;
+        if (temp instanceof Square){
+            temp = new Rectangle("test", ((Square) temp).x, ((Square) temp).y, ((Square) temp).l, ((Square) temp).l);
+        }
+        if (temp instanceof Rectangle){
+            p1 = new Line("p1", ((Rectangle) temp).x, ((Rectangle) temp).y, ((Rectangle) temp).x+ ((Rectangle) temp).w, ((Rectangle) temp).y);
+            p2 = new Line("p2", ((Rectangle) temp).x, ((Rectangle) temp).y- ((Rectangle) temp).h, ((Rectangle) temp).x+ ((Rectangle) temp).w, ((Rectangle) temp).y- ((Rectangle) temp).h);
+            p3 = new Line("p3", ((Rectangle) temp).x, ((Rectangle) temp).y, ((Rectangle) temp).x, ((Rectangle) temp).y- ((Rectangle) temp).h);
+            p4 = new Line("p4", ((Rectangle) temp).x+ ((Rectangle) temp).w, ((Rectangle) temp).y, ((Rectangle) temp).x+ ((Rectangle) temp).w, ((Rectangle) temp).y- ((Rectangle) temp).h);
+            flag = (containspoint(p1, temp1) || containspoint(p2, temp1) || containspoint(p3, temp1) || containspoint(p4, temp1));
+        }
+        if (temp1 instanceof Square){
+            temp1 = new Rectangle("test", ((Square) temp1).x, ((Square) temp1).y, ((Square) temp1).l, ((Square) temp1).l);
+        }
+        if (temp1 instanceof Rectangle){
+            p1 = new Line("p1", ((Rectangle) temp1).x, ((Rectangle) temp1).y, ((Rectangle) temp1).x+ ((Rectangle) temp1).w, ((Rectangle) temp1).y);
+            p2 = new Line("p2", ((Rectangle) temp1).x, ((Rectangle) temp1).y- ((Rectangle) temp1).h, ((Rectangle) temp1).x+ ((Rectangle) temp1).w, ((Rectangle) temp1).y- ((Rectangle) temp1).h);
+            p3 = new Line("p3", ((Rectangle) temp1).x, ((Rectangle) temp1).y, ((Rectangle) temp1).x, ((Rectangle) temp1).y- ((Rectangle) temp1).h);
+            p4 = new Line("p4", ((Rectangle) temp1).x+ ((Rectangle) temp1).w, ((Rectangle) temp1).y, ((Rectangle) temp1).x+ ((Rectangle) temp1).w, ((Rectangle) temp1).y- ((Rectangle) temp1).h);
+            flag = (containspoint(temp, p1) || containspoint(temp, p2) || containspoint(temp, p3) || containspoint(temp, p4));
+        }
+        if (temp instanceof Circle && temp1 instanceof Circle){
+            flag = check2circle((Circle) temp, (Circle) temp1);
+        }
+        else if (temp instanceof Circle && temp1 instanceof Line){
+            flag = checkCircleLine((Circle) temp, (Line) temp1);
+        }
+        else if (temp instanceof Line && temp1 instanceof Circle){
+            flag = checkCircleLine((Circle) temp1, (Line) temp);
+        }
+        else if (temp instanceof Line && temp1 instanceof Line){
+            flag = check2Line((Line) temp, (Line) temp1);
+        }
+        return flag;
+    }
+
+    public static boolean check2circle(Circle n1, Circle n2){
+        double num = pythegorean(n1.x, n1.y, n2.x, n2.y);
+        if (num < Math.abs(n1.r - n2.r) || num > (n1.r + n2.r)){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+    public static boolean checkCircleLine(Circle n1, Line n2){
+        double x1Intersect, y1Intersect, x2Intersect, y2Intersect;
+        if (Math.abs(n2.x2 - n2.x1) == 0){
+            if (Math.abs(n2.x1 - n1.x) > n1.r){
+                return false;
+            }
+            else if (Math.abs(n2.x1 - n1.x) == n1.r){
+                x1Intersect = n2.x1;
+                y1Intersect = n1.y;
+                if (Math.abs(pythegorean(n2.x1, n2.y1, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
+                        || Math.abs(pythegorean(n2.x2, n2.y2, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
+                    return false;
+                }
+                return true;
+            }
+            else{
+                x1Intersect = n2.x1;
+                x2Intersect = n2.x1;
+                double a = 1;
+                double b = -2*n1.y;
+                double c = Math.pow(x1Intersect-n1.x,2) + Math.pow(n1.y,2) - Math.pow(n1.r,2);
+                y1Intersect = (-b + Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
+                y2Intersect = (-b - Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
+                if (Math.abs(pythegorean(n2.x1, n2.y1, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
+                        || Math.abs(pythegorean(n2.x2, n2.y2, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
+                    if (Math.abs(pythegorean(n2.x1, n2.y1, x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
+                            || Math.abs(pythegorean(n2.x2, n2.y2, x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        else{
+            double m = (n2.y2 - n2.y1) / (n2.x2 - n2.x1);
+            double temp = n2.y1 - m*n2.x1 - n1.y;
+            double a = Math.pow(m,2) + 1;
+            double b = 2*m*temp - 2*n1.x;
+            double c = Math.pow(n1.x,2) + Math.pow(temp,2) - Math.pow(n1.r,2);
+            double determinant = Math.pow(b,2) - (4*a*c);
+            if (determinant < 0){
+                return false;
+            }
+            else if (determinant == 0){
+                x1Intersect = (-b) / (2*a);
+                y1Intersect = m*x1Intersect + n2.y1 - m*n2.x1;
+                if (Math.abs(pythegorean(n1.x, n1.y, x1Intersect, y1Intersect) - n1.r) < 0.00001){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+            else{
+                x1Intersect = (-b + Math.sqrt(determinant)) / (2*a);
+                y1Intersect = m*x1Intersect + n2.y1 - m*n2.x1;
+                x2Intersect = (-b - Math.sqrt(determinant)) / (2*a);
+                y2Intersect = m*x2Intersect + n2.y1 - m*n2.x1;
+                if (Math.abs(pythegorean(n2.x1, n2.y1, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
+                || Math.abs(pythegorean(n2.x2, n2.y2, x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
+                    if (Math.abs(pythegorean(n2.x1, n2.y1, x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))
+                            || Math.abs(pythegorean(n2.x2, n2.y2, x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.x1, n2.y1, n2.x2, n2.y2))){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+    }
+    public static boolean check2Line (Line n1, Line n2){
+        double xIntersect, yIntersect;
+        if (n1.x2-n1.x1 == 0 && n2.x2-n2.x1 == 0){
+            if (n1.x1 != n2.x1){
+                return false;
+            }
+            else if(Math.abs(n1.y1 - n2.y1) > Math.abs(n2.y1 - n2.y2) || Math.abs(n1.y1 - n2.y2) > Math.abs(n2.y1 - n2.y2)){
+                if(Math.abs(n1.y2 - n2.y1) > Math.abs(n2.y1 - n2.y2) || Math.abs(n1.y2 - n2.y2) > Math.abs(n2.y1 - n2.y2)){
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (n1.x2-n1.x1 == 0){
+            xIntersect = n1.x1;
+            double m2 = (n2.y2-n2.y1)/(n2.x2-n2.x1);
+            yIntersect = n2.y1-m2*n2.x1 - (-m2*xIntersect);
+            if(Math.abs(yIntersect-n1.y1) > Math.abs(n1.y1-n1.y2) || Math.abs(yIntersect-n1.y2) > Math.abs(n1.y1-n1.y2)){
+                return false;
+            }
+            else if(pythegorean(xIntersect,yIntersect,n2.x1,n2.y1) > pythegorean(n2.x1,n2.y1,n2.x2,n2.y2)
+                || pythegorean(xIntersect,yIntersect,n2.x2,n2.y2) > pythegorean(n2.x1,n2.y1,n2.x2,n2.y2)){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
+        else if (n2.x2-n2.x1 == 0){
+            xIntersect = n2.x1;
+            double m = (n1.y2-n1.y1)/(n1.x2-n1.x1);
+            yIntersect = n1.y1-m*n1.x1 - (-m*xIntersect);
+            if(Math.abs(yIntersect-n2.y1) > Math.abs(n2.y1-n2.y2) || Math.abs(yIntersect-n2.y2) > Math.abs(n2.y1-n2.y2)){
+                return false;
+            }
+            else if(pythegorean(xIntersect,yIntersect,n1.x1,n1.y1) > pythegorean(n1.x1,n1.y1,n1.x2,n1.y2)
+                    || pythegorean(xIntersect,yIntersect,n1.x2,n1.y2) > pythegorean(n1.x1,n1.y1,n1.x2,n1.y2)){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
+        else{
+            double m = (n1.y2-n1.y1)/(n1.x2-n1.x1); //slope
+            double m2 = (n2.y2-n2.y1)/(n2.x2-n2.x1); //another slope
+            double a = -m, b = 1, c = n1.y1-m*n1.x1;    //ax + by = c
+            double d = -m2, e = 1, f = n2.y1-m2*n2.x1;  //dx + ey = f
+            //solving 2 equations with 2 unknowns (with matrix)
+            double temp = b*d - a*e;
+            if (m == m2){
+                if (c != f){
+                    return false;
+                }
+                else if(pythegorean(n1.x1, n1.y1, n2.x1, n2.y1) > pythegorean(n2.x1, n2.y1, n2.x2, n2.y2) ||
+                        pythegorean(n1.x1, n1.y1, n2.x2, n2.y2) > pythegorean(n2.x1, n2.y1, n2.x2, n2.y2)){
+                    if(pythegorean(n1.x2, n1.y2, n2.x1, n2.y1) > pythegorean(n2.x1, n2.y1, n2.x2, n2.y2) ||
+                            pythegorean(n1.x2, n1.y2, n2.x2, n2.y2) > pythegorean(n2.x1, n2.y1, n2.x2, n2.y2)){
+                        return false;
+                    }
+                }
+                return true;
+            }
+            xIntersect = (b*f - c*e) / temp;
+            yIntersect = (c*d - a*f) / temp;
+            if(pythegorean(xIntersect,yIntersect,n1.x1,n1.y1) > pythegorean(n1.x1,n1.y1,n1.x2,n1.y2)
+                    || pythegorean(xIntersect,yIntersect,n1.x2,n1.y2) > pythegorean(n1.x1,n1.y1,n1.x2,n1.y2)
+                    || pythegorean(xIntersect,yIntersect,n2.x1,n2.y1) > pythegorean(n2.x1,n2.y1,n2.x2,n2.y2)
+                    || pythegorean(xIntersect,yIntersect,n2.x2,n2.y2) > pythegorean(n2.x1,n2.y1,n2.x2,n2.y2)){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
+    }
+    public static ArrayList<Shape> subShapes(Shape n){
         Shape temp = cur;
-        while(temp != null){
-            if(temp instanceof Group == false) {
-                temp.getInfo(1);
+        ArrayList<Shape> ret = new ArrayList<>();
+        if (n instanceof Group){
+            for (int i=0; i<((Group) n).s1.length; i++){
+                if (((Group) n).s1[i] instanceof Group){
+                    ret.addAll(subShapes(((Group) n).s1[i]));
+                }
+                else{
+                    ret.add(((Group) n).s1[i]);
+                }
+            }
+            return ret;
+        }
+        else{
+            ret.add(n);
+            return ret;
+        }
+    }
+    /**-----------------[pickandmove related methods]------------------------------------------------------------**/
+    public static void pickandmove(double x, double y, double dx, double dy){
+        Shape temp = cur;
+        while (temp != null) {
+            if (containspoint(temp, x, y)) {
+                break;
             }
             temp = temp.previous;
         }
-        return true;
+        if (temp == null){
+            System.out.println("There isn't any shape satisfying the parameters.");
+            return;
+        }
+        else{
+            while (temp.grouparent != null){
+                temp = temp.grouparent;
+            }
+            temp.move(dx, dy);
+        }
     }
 
-    public static Shape[] subShapes(Shape n){
+    public static boolean containspoint(Shape temp, double x, double y){
+        Shape temp2 = new Shape("test");
+        boolean flag = false;
+        if (temp instanceof Group){
+            for (int i=0; i< ((Group) temp).s1.length; i++) {
+                flag = (flag || containspoint(((Group) temp).s1[i], x, y));
+            }
+            return flag;
+        }
+        else if (temp instanceof Circle){
+            flag = minDistance(((Circle) temp).x, ((Circle) temp).y, x, y, ((Circle) temp).r);
+        }
+        else if (temp instanceof Rectangle){
+            temp2 = (Rectangle) temp;
+        }
+        else if (temp instanceof Square){
+            temp2 = new Rectangle("test", ((Square) temp).x, ((Square) temp).y, ((Square) temp).l, ((Square) temp).l);
+        }
+        else if (temp instanceof Line){
+            flag = minDistance(((Line) temp).x1, ((Line) temp).y1, ((Line) temp).x2, ((Line) temp).y2, x, y);
+        }
+        if (temp2 instanceof Rectangle){
+            Line p1 = new Line("p1", ((Rectangle) temp2).x, ((Rectangle) temp2).y, ((Rectangle) temp2).x+ ((Rectangle) temp2).w, ((Rectangle) temp2).y);
+            Line p2 = new Line("p2", ((Rectangle) temp2).x, ((Rectangle) temp2).y- ((Rectangle) temp2).h, ((Rectangle) temp2).x+ ((Rectangle) temp2).w, ((Rectangle) temp2).y- ((Rectangle) temp2).h);
+            Line p3 = new Line("p3", ((Rectangle) temp2).x, ((Rectangle) temp2).y, ((Rectangle) temp2).x, ((Rectangle) temp2).y- ((Rectangle) temp2).h);
+            Line p4 = new Line("p4", ((Rectangle) temp2).x+ ((Rectangle) temp2).w, ((Rectangle) temp2).y, ((Rectangle) temp2).x+ ((Rectangle) temp2).w, ((Rectangle) temp2).y- ((Rectangle) temp2).h);
+            flag = (containspoint(p1, x, y) || containspoint(p2, x, y) || containspoint(p3, x, y) || containspoint(p4, x, y));
+        }
+        return flag;
+    }
 
-    }*/
+    //Circle minDistance
+    public static boolean minDistance(double x, double y, double dx, double dy, double r){
+        double distance = pythegorean(x, y, dx, dy);
+        if (Math.abs(distance - r) < 0.05){
+            return true;
+        }
+        return false;
+    }
+
+    //Rectangle, Square and Line minDistance
+    public static boolean minDistance(double x1, double y1, double x2, double y2, double dx, double dy){
+        double xIntersect, yIntersect, distance;
+        if (y2-y1 == 0){
+            xIntersect = dx;
+            yIntersect = y1;
+        }
+        else if (x2-x1 == 0){
+            xIntersect = x1;
+            yIntersect = dy;
+        }
+        else{
+            double m = (y2-y1)/(x2-x1); //slope
+            double m2 = -1 / m; //perpendicular to slope
+            double a = -m, b = 1, c = y1-m*x1;    //ax + by = c
+            double d = -m2, e = 1, f = dy-m2*dx;  //dx + ey = f
+            //solving 2 equations with 2 unknowns (with matrix)
+            double temp = b*d - a*e;
+            xIntersect = (b*f - c*e) / temp;
+            yIntersect = (c*d - a*f) / temp;
+        }
+        if (pythegorean(xIntersect,yIntersect,x2,y2) > pythegorean(x1,y1,x2,y2) || pythegorean(xIntersect,yIntersect,x1,y1) > pythegorean(x1,y1,x2,y2)){
+            if(pythegorean(xIntersect,yIntersect,x2,y2) > pythegorean(xIntersect,yIntersect,x1,y1)){
+                distance = pythegorean(dx,dy,x1,y1);
+            }
+            else{
+                distance = pythegorean(dx,dy,x2,y2);
+            }
+        }
+        else{
+            distance = pythegorean(dx,dy,xIntersect,yIntersect);
+        }
+        if (distance < 0.05){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    public static double pythegorean(double x, double y, double dx, double dy){
+        double xDif = x-dx;
+        double yDif = y-dy;
+        return Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
+    }
     /**-----------------[Delete related methods]------------------------------------------------------------**/
 
     public static boolean delete(String name){     //delete function prototype part 1
