@@ -115,6 +115,10 @@ public class ClevisTest {
         assertTrue(clevis.CLI("move mo2 2 2"));
         clevis.CLI("delete moveTest");
     }
+    @Test
+    void TestPickandmove(){
+        clevis.CLI("line a 2 7 4 9");
+    }
 
     @Test
     void TestList(){

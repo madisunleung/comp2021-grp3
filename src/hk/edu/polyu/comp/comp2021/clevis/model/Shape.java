@@ -248,8 +248,9 @@ public class Shape {
      */
     public static boolean containspoint(Shape temp, Shape temp1){
         boolean flag = false;
-        Line p1, p2, p3, p4;
+        Shape p1, p2, p3, p4;
         double[] data = new double[4];
+        double[] data2 = new double[4];
         if (temp.getSubClass().equals("Square")){
             data = temp.getData();
             temp = new Rectangle("test", data[0], data[1], data[2], data[2]);
@@ -278,10 +279,14 @@ public class Shape {
             flag = check2circle(temp, temp1);
         }
         else if (temp.getSubClass().equals("Circle") && temp1.getSubClass().equals("Line")){
-            flag = checkCircleLine((Circle) temp, (Line) temp1);
+            data = temp.getData();
+            data2 = temp1.getData();
+            flag = checkCircleLine(new Circle("test", data[0], data[1], data[2]), new Line("test",data2[0], data2[1], data2[2], data2[3]));
         }
         else if (temp.getSubClass().equals("Line") && temp1.getSubClass().equals("Circle")){
-            flag = checkCircleLine((Circle) temp1, (Line) temp);
+            data = temp.getData();
+            data2 = temp1.getData();
+            flag = checkCircleLine(new Circle("test",data2[0], data2[1], data2[2]), new Line("test", data[0], data[1], data[2], data[3]));
         }
         else if (temp.getSubClass().equals("Line") && temp1.getSubClass().equals("Line")){
             flag = check2Line(temp, temp1);
@@ -313,34 +318,36 @@ public class Shape {
      * @param n2    the parameters of the line
      * @return      a boolean value indicating whether they intersect
      */
-    public static boolean checkCircleLine(Circle n1, Line n2){
+    public static boolean checkCircleLine(Shape n1, Shape n2){
+        double[] data1 = n1.getData();
+        double[] data2 = n2.getData();
         double x1Intersect, y1Intersect, x2Intersect, y2Intersect;
         final double DELTA = 0.00001;
-        if (Math.abs(n2.getX2() - n2.getX1()) == 0){
-            if (Math.abs(n2.getX1() - n1.getX()) > n1.getR()){
+        if (Math.abs(data2[2] - data2[0]) == 0){
+            if (Math.abs(data2[0] - data1[0]) > data1[2]){
                 return false;
             }
-            else if (Math.abs(n2.getX1() - n1.getX()) == n1.getR()){
-                x1Intersect = n2.getX1();
-                y1Intersect = n1.getY();
-                if (Math.abs(pythegorean(n2.getX1(), n2.getY1(), x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))
-                        || Math.abs(pythegorean(n2.getX2(), n2.getY2(), x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))){
+            else if (Math.abs(data2[0] - data1[0]) == data1[2]){
+                x1Intersect = data2[0];
+                y1Intersect = data1[1];
+                if (Math.abs(pythegorean(data2[0], data2[1], x1Intersect, y1Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))
+                        || Math.abs(pythegorean(data2[2], data2[3], x1Intersect, y1Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))){
                     return false;
                 }
                 return true;
             }
             else{
-                x1Intersect = n2.getX1();
-                x2Intersect = n2.getX1();
+                x1Intersect = data2[0];
+                x2Intersect = data2[0];
                 double a = 1;
-                double b = -2* n1.getY();
-                double c = Math.pow(x1Intersect- n1.getX(),2) + Math.pow(n1.getY(),2) - Math.pow(n1.getR(),2);
+                double b = -2* data1[1];
+                double c = Math.pow(x1Intersect- data1[0],2) + Math.pow(data1[1],2) - Math.pow(data1[2],2);
                 y1Intersect = (-b + Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
                 y2Intersect = (-b - Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
-                if (Math.abs(pythegorean(n2.getX1(), n2.getY1(), x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))
-                        || Math.abs(pythegorean(n2.getX2(), n2.getY2(), x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))){
-                    if (Math.abs(pythegorean(n2.getX1(), n2.getY1(), x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))
-                            || Math.abs(pythegorean(n2.getX2(), n2.getY2(), x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))){
+                if (Math.abs(pythegorean(data2[0], data2[1], x1Intersect, y1Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))
+                        || Math.abs(pythegorean(data2[2], data2[3], x1Intersect, y1Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))){
+                    if (Math.abs(pythegorean(data2[0], data2[1], x2Intersect, y2Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))
+                            || Math.abs(pythegorean(data2[2], data2[3], x2Intersect, y2Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))){
                         return false;
                     }
                 }
@@ -348,19 +355,19 @@ public class Shape {
             }
         }
         else{
-            double m = (n2.getY2() - n2.getY1()) / (n2.getX2() - n2.getX1());
-            double temp = n2.getY1() - m* n2.getX1() - n1.getY();
+            double m = (data2[3] - data2[1]) / (data2[2] - data2[0]);
+            double temp = data2[1] - m* data2[0] - data1[1];
             double a = Math.pow(m,2) + 1;
-            double b = 2*m*temp - 2* n1.getX();
-            double c = Math.pow(n1.getX(),2) + Math.pow(temp,2) - Math.pow(n1.getR(),2);
+            double b = 2*m*temp - 2* data1[0];
+            double c = Math.pow(data1[0],2) + Math.pow(temp,2) - Math.pow(data1[2],2);
             double determinant = Math.pow(b,2) - (4*a*c);
             if (determinant < 0){
                 return false;
             }
             else if (determinant == 0){
                 x1Intersect = (-b) / (2*a);
-                y1Intersect = m*x1Intersect + n2.getY1() - m* n2.getX1();
-                if (Math.abs(pythegorean(n1.getX(), n1.getY(), x1Intersect, y1Intersect) - n1.getR()) < DELTA){
+                y1Intersect = m*x1Intersect + data2[1] - m* data2[0];
+                if (Math.abs(pythegorean(data1[0], data1[1], x1Intersect, y1Intersect) - data1[2]) < DELTA){
                     return true;
                 }
                 else{
@@ -369,13 +376,13 @@ public class Shape {
             }
             else{
                 x1Intersect = (-b + Math.sqrt(determinant)) / (2*a);
-                y1Intersect = m*x1Intersect + n2.getY1() - m* n2.getX1();
+                y1Intersect = m*x1Intersect + data2[1] - m* data2[0];
                 x2Intersect = (-b - Math.sqrt(determinant)) / (2*a);
-                y2Intersect = m*x2Intersect + n2.getY1() - m* n2.getX1();
-                if (Math.abs(pythegorean(n2.getX1(), n2.getY1(), x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))
-                        || Math.abs(pythegorean(n2.getX2(), n2.getY2(), x1Intersect, y1Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))){
-                    if (Math.abs(pythegorean(n2.getX1(), n2.getY1(), x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))
-                            || Math.abs(pythegorean(n2.getX2(), n2.getY2(), x2Intersect, y2Intersect)) > Math.abs(pythegorean(n2.getX1(), n2.getY1(), n2.getX2(), n2.getY2()))){
+                y2Intersect = m*x2Intersect + data2[1] - m* data2[0];
+                if (Math.abs(pythegorean(data2[0], data2[1], x1Intersect, y1Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))
+                        || Math.abs(pythegorean(data2[2], data2[3], x1Intersect, y1Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))){
+                    if (Math.abs(pythegorean(data2[0], data2[1], x2Intersect, y2Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))
+                            || Math.abs(pythegorean(data2[2], data2[3], x2Intersect, y2Intersect)) > Math.abs(pythegorean(data2[0], data2[1], data2[2], data2[3]))){
                         return false;
                     }
                 }
@@ -478,12 +485,14 @@ public class Shape {
         Shape temp = cur;
         ArrayList<Shape> ret = new ArrayList<>();
         if (n.getSubClass().equals("Group")){
-            for (int i = 0; i< ((Group) n).getS1().length; i++){
-                if (((Group) n).getS1()[i].getSubClass().equals("Group")){
-                    ret.addAll(subShapes(((Group) n).getS1()[i]));
+            Shape[] test = new Shape[1];
+            test[0] = n;
+            for (int i = 0; i< (new Group("test", test)).getS1().length; i++){
+                if ((new Group("test", test)).getS1()[i].getSubClass().equals("Group")){
+                    ret.addAll(subShapes((new Group("test", test)).getS1()[i]));
                 }
                 else{
-                    ret.add(((Group) n).getS1()[i]);
+                    ret.add((new Group("test", test)).getS1()[i]);
                 }
             }
             return ret;
@@ -531,11 +540,14 @@ public class Shape {
      */
     public static boolean containspoint(Shape temp, double x, double y){
         Shape temp2 = new Shape("test");
+        Shape p1, p2, p3, p4;
         boolean flag = false;
         double[] data = new double[4];
+        Shape[] test = new Shape[1];
+        test[0] = temp;
         if (temp.getSubClass().equals("Group")){
-            for (int i = 0; i< ((Group) temp).getS1().length; i++) {
-                flag = (flag || containspoint(((Group) temp).getS1()[i], x, y));
+            for (int i = 0; i< (new Group("test", test)).getS1().length; i++) {
+                flag = (flag || containspoint((new Group("test", test)).getS1()[i], x, y));
             }
             return flag;
         }
@@ -544,7 +556,7 @@ public class Shape {
             flag = minDistance(data[0], data[1], x, y, data[2]);
         }
         else if (temp.getSubClass().equals("Rectangle")){
-            temp2 = (Rectangle) temp;
+            temp2 = temp;
         }
         else if (temp.getSubClass().equals("Square")){
             data = temp.getData();
@@ -556,10 +568,10 @@ public class Shape {
         }
         if (temp2.getSubClass().equals("Rectangle")){
             data = temp2.getData();
-            Line p1 = new Line("p1", data[0], data[1], data[0] + data[2], data[1]);
-            Line p2 = new Line("p2", data[0], data[1] - data[3], data[0] + data[2], data[1] - data[3]);
-            Line p3 = new Line("p3", data[0], data[1], data[0], data[1] - data[3]);
-            Line p4 = new Line("p4", data[0] + data[2], data[1], data[0] + data[2], data[1] - data[3]);
+            p1 = new Line("p1", data[0], data[1], data[0] + data[2], data[1]);
+            p2 = new Line("p2", data[0], data[1] - data[3], data[0] + data[2], data[1] - data[3]);
+            p3 = new Line("p3", data[0], data[1], data[0], data[1] - data[3]);
+            p4 = new Line("p4", data[0] + data[2], data[1], data[0] + data[2], data[1] - data[3]);
             flag = (containspoint(p1, x, y) || containspoint(p2, x, y) || containspoint(p3, x, y) || containspoint(p4, x, y));
         }
         return flag;
