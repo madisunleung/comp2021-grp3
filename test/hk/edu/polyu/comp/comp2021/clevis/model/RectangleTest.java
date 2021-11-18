@@ -24,18 +24,18 @@ class RectangleTest {
     @Test
     void move() {
         rec1.move(4, 5);
-        assertEquals(7, rec1.x);
-        assertEquals(8, rec1.y);
+        assertEquals(7, rec1.getX());
+        assertEquals(8, rec1.getY());
 
         rec3.move(4, 5);
-        assertNotEquals(7, rec3.x);
-        assertNotEquals(8, rec3.y);
-        assertEquals(11, rec3.x);
-        assertEquals(13, rec3.y);
+        assertNotEquals(7, rec3.getX());
+        assertNotEquals(8, rec3.getY());
+        assertEquals(11, rec3.getX());
+        assertEquals(13, rec3.getY());
 
         rec4.move(9.8765, 4.321);
-        assertEquals(11.1105, rec4.x);
-        assertEquals(9.991, rec4.y);
+        assertEquals(11.1105, rec4.getX());
+        assertEquals(9.991, rec4.getY());
 
     }
 

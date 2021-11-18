@@ -17,10 +17,10 @@ class LineTest {
     @Test
     void move() {
         l1.move(10,10);
-        assertEquals(10,l1.x1);
-        assertEquals(10,l1.x2);
-        assertEquals(10,l1.y1);
-        assertEquals(10,l1.y2);
+        assertEquals(10, l1.getX1());
+        assertEquals(10, l1.getX2());
+        assertEquals(10, l1.getY1());
+        assertEquals(10, l1.getY2());
     }
 
     @Test

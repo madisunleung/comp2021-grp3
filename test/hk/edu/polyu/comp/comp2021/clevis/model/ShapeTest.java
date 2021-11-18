@@ -52,8 +52,8 @@ class ShapeTest {
     void testMove() {
         Square x = new Square("x", 3, 3, 3);
         x.move(10, 20);
-        assertEquals(13, x.x);
-        assertEquals(23, x.y);
+        assertEquals(13, x.getX());
+        assertEquals(23, x.getY());
     }
 
     @Test
@@ -195,9 +195,9 @@ class ShapeTest {
         hi.move(10,10);
         hi.getInfo(1);
         Shape.Undos();
-        assertEquals(3,hi.x);
-        assertEquals(3,hi.y);
-        assertEquals(3,hi.l);
+        assertEquals(3, hi.getX());
+        assertEquals(3, hi.getY());
+        assertEquals(3, hi.getL());
         hi.getInfo(1);
         //of course we can do more undos in a row
         hi.move(10,10);
@@ -206,9 +206,9 @@ class ShapeTest {
         hi.getInfo(1);
         Shape.Undos();
         Shape.Undos();
-        assertEquals(3,hi.x);
-        assertEquals(3,hi.y);
-        assertEquals(3,hi.l);
+        assertEquals(3, hi.getX());
+        assertEquals(3, hi.getY());
+        assertEquals(3, hi.getL());
         hi.getInfo(1);
     }
 
@@ -233,8 +233,8 @@ class ShapeTest {
         hi.getInfo(1);
         Shape.Redo();
         hi.getInfo(1);           //reverted one undo (3,3,3)->(13,13,3)->(18,113,3)->undone(13,13,3)->undone(3,3,3)->redone(13,13,3)
-        assertEquals(13,hi.x);
-        assertEquals(13,hi.y);
-        assertEquals(3,hi.l);
+        assertEquals(13, hi.getX());
+        assertEquals(13, hi.getY());
+        assertEquals(3, hi.getL());
     }
 }

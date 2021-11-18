@@ -100,10 +100,10 @@ public class Clevis {
         } else if (sinput.matches("move " + nregex + " " + fregex + " " + fregex)) {                             //Move a shape, basically complete
             invalid = move(sinput);
         } else if (sinput.matches("pick-and-move " + fregex + " " + fregex + " " + fregex + " " + fregex)) {
-            System.out.println("pick-and-move command recognized");
+            invalid = pickandmove(sinput);
             Shape.ClearRedo();
         } else if (sinput.matches("intersect " + nregex + " " + nregex)) {
-            System.out.println("intersect command recognized");
+            invalid = intersect(sinput);
         } else if (sinput.matches("list " + nregex)) {                                                //List a single shape, basically complete
             invalid = list(sinput);
         } else if (sinput.equals("listAll")) {                                                           //List all the shape, basically complete
@@ -333,6 +333,45 @@ public class Clevis {
             return true;
         }
     }
+
+    /**
+     * method pickandmove:
+     * Check if the action is valid, yes then finds the shape to move by the passed in parameters
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     */
+    public boolean pickandmove(String sinput){
+        System.out.println("pick-and-move command recognized");
+        String[] cmd = sinput.split(" ");
+        Shape.pickandmove(Double.parseDouble(cmd[1]), Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]));
+        return false;
+    }
+
+    /**
+     * method intersect:
+     * Check if the action is valid, yes then checks whether the inputted shapes intersect with each other
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     */
+    public boolean intersect(String sinput){
+        System.out.println("intersect command recognized");
+        String[] cmd = sinput.split(" ");
+        Shape temp = Shape.findAShape(cmd[1]);
+        Shape temp2 = Shape.findAShape(cmd[2]);
+        if (temp == null || temp2 == null){
+            System.out.println("At least one of the shapes are not found");
+            return true;
+        }
+        else if (Shape.intersect(temp, temp2)){
+            System.out.println("Shape " + cmd[1] + " and Shape " + cmd[2] + " intersects each other.");
+            return false;
+        }
+        else{
+            System.out.println("Shape " + cmd[1] + " and Shape " + cmd[2] + " does not intersect with each other.");
+            return false;
+        }
+    }
+
 
     /**
      * method list:
