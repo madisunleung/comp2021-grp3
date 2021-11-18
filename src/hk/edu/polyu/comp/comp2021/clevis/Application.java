@@ -23,12 +23,7 @@ public class Application {
      */
 
     public static void main(String[] args) throws IOException {
-        if(args.length==0){
-            Clevis clevis = new Clevis("log.html","log.txt");
-        }
-        else {
-            Clevis clevis = new Clevis(args[1], args[3]);
-        }
+        Clevis clevis = new Clevis(args[1], args[3]);
         // Initialize and utilize the system
     }
 }

@@ -231,6 +231,7 @@ public class Clevis {
             if (nameNotUsed(cmd[1])) {
                 for(int i=2; i<cmd.length; i++){
                     if(a[i-2] == null || a[i - 2].getGrouparent() != null){
+                        System.out.println("A member shape of this group already belongs to another shape.");
                         return true;
                     }
                 }
@@ -244,6 +245,7 @@ public class Clevis {
                 return true;
             }
         }
+        System.out.println("Invalid group command.");
         return true;
     }
 

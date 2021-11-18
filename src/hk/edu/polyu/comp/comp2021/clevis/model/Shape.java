@@ -89,13 +89,6 @@ public class Shape {
     public String getSubClass(){return "";}
 
     /**
-     * method createShape:
-     * this method is overridden in every subclasses, returning the shape in the type of the specified subclass
-     * @return      the shape that was created
-     */
-    public Shape createShape(){return null;}
-
-    /**
      * method getData:
      * this method is overridden in every subclasses, returning the parameters of the given shape
      * @return an array of double indicating different parameters of a given shape
@@ -401,7 +394,7 @@ public class Shape {
         double xIntersect, yIntersect;
         double[] data1 = n1.getData();
         double[] data2 = n2.getData();
-        if (data1[1] - data1[0] == 0 && data2[2] - data2[0] == 0){
+        if (data1[2] - data1[0] == 0 && data2[2] - data2[0] == 0){
             if (data1[0] != data2[0]){
                 return false;
             }
@@ -963,11 +956,7 @@ class Rectangle extends Shape {
         this.setW(w);
         this.setH(h);
     }
-    @Override
-    public Shape createShape(){
-        Rectangle ret = new Rectangle(this.getName(), this.getX(), this.getY(), this.getW(), this.getH());
-        return ret;
-    }
+
     @Override
     public String getSubClass(){return "Rectangle";}
     @Override
@@ -1101,11 +1090,7 @@ class Line extends Shape {
         this.setY1(y1);
         this.setY2(y2);
     }
-    @Override
-    public Shape createShape(){
-        Line ret = new Line(this.getName(), this.getX1(), this.getY1(), this.getX2(), this.getY2());
-        return ret;
-    }
+
     @Override
     public String getSubClass(){return "Line";}
     @Override
@@ -1353,11 +1338,7 @@ class Square extends Shape {
         this.setY(y);
         this.setL(l);
     }
-    @Override
-    public Shape createShape(){
-        Square ret = new Square(this.getName(), this.getX(), this.getY(), this.getL());
-        return ret;
-    }
+
     @Override
     public String getSubClass(){return "Square";}
     @Override

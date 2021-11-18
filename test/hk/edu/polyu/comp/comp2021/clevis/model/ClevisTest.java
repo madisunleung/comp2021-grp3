@@ -115,10 +115,6 @@ public class ClevisTest {
         assertTrue(clevis.CLI("move mo2 2 2"));
         clevis.CLI("delete moveTest");
     }
-    @Test
-    void TestPickandmove(){
-        clevis.CLI("line a 2 7 4 9");
-    }
 
     @Test
     void TestList(){
@@ -178,5 +174,54 @@ public class ClevisTest {
         clevis.writeLogs("log.html","log.txt");
     }
 
+    @Test
+    void TestIntersect(){
+        clevis.CLI("rectangle i1 5 4 10 15");
+        clevis.CLI("line i2 6.1 7.9 10 2");
+        clevis.CLI("circle i3 50 100 9 ");
+        clevis.CLI("square i4 24 96 5 ");
+        clevis.CLI("line i5 6.5 8 6.5 100");
+        clevis.CLI("circle i6 3 3 5");
+        clevis.CLI("circle i7 4 4 3");
+        clevis.CLI("line i8 8 4 8 5");
+        clevis.CLI("line i9 2 8 4 8");
+        clevis.CLI("group ai i1 i2");
+        clevis.CLI("group bi i4 i3");
+        assertTrue(clevis.CLI("intersect ai bi"));
+        clevis.CLI("group ci bi ai");
+        assertTrue(clevis.CLI("intersect ci i5"));
+        assertTrue(clevis.CLI("intersect i6 i7"));
+        assertTrue(clevis.CLI("intersect i6 i8"));
+        clevis.CLI("move i8 -5 0");
+        assertTrue(clevis.CLI("intersect i6 i8"));
+        assertTrue(clevis.CLI("intersect i6 i9"));
+        clevis.CLI("move i9 0 -3");
+        assertTrue(clevis.CLI("intersect i6 i9"));
+        clevis.CLI("line i10 10 10 10 20");
+        clevis.CLI("line i11 11 8 11 9");
+        assertTrue(clevis.CLI("intersect i10 i11"));
+        clevis.CLI("move i11 -1 0");
+        assertTrue(clevis.CLI("intersect i10 i11"));
+        clevis.CLI("line i12 0 0 12 12");
+        assertTrue(clevis.CLI("intersect i12 i11"));
+        assertTrue(clevis.CLI("intersect i11 i12"));
+        clevis.CLI("line i13 13 13 14 14");
+        clevis.CLI("line i14 13 14 14 13");
+        assertTrue(clevis.CLI("intersect i12 i13"));
+        assertTrue(clevis.CLI("intersect i13 i14"));
+        clevis.CLI("line i15 5 5 15 15");
+        assertTrue(clevis.CLI("intersect i10 i15"));
+    }
 
+    @Test
+    void TestPickandmove(){
+        clevis.CLI("rectangle j1 5 4 10 15");
+        clevis.CLI("line j2 6.1 7.9 10 2");
+        clevis.CLI("circle j3 50 100 9");
+        clevis.CLI("square j4 24 96 5");
+        clevis.CLI("group aj j1 j2");
+        clevis.CLI("group bj j1 j3");
+        assertTrue(clevis.CLI("pick-and-move 5 4 6 6"));
+        assertTrue(clevis.CLI("pick-and-move 100 100 6 6"));
+    }
 }
