@@ -1,19 +1,29 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
-import org.w3c.dom.css.Rect;
-import java.util.Arrays;
 import java.util.Stack;
 
+
+/**
+ * The shape class, extended into subclasses of shapes (Rectangle, line, circle, square and group)
+ * Each instance of shape contains the name of the shape for base, and all of them contains the property of a doubly linked list node
+ * Along with methods to manipulate the doubly linked list of shapes or the shape themselves individually
+ * Static methods are provided as well to access the doubly linked list easily
+ */
+
 public class Shape {
-    /**                 Basic Settings              **/
     private final String name;
-    Shape next;
-    Shape previous;
-    Shape grouparent = null;
+    private Shape next;
+    private Shape previous;
+    private Shape grouparent = null;
     
 
-    public static Shape cur=null;
-    public static Shape head= null;
+    private static Shape cur=null;
+    private static Shape head= null;
+
+    /**
+     *
+     * @param name      The name of the shape, each subclass calls super(name) to ensure the name is passed into here and stored
+     */
 
     public Shape(String name) {
         // DON'T FORGET VALIDATION
@@ -23,47 +33,166 @@ public class Shape {
         this.name = name;
     }
 
+    /**
+     * Static method addShape:
+     * called to add a shape into the doubly linked list of shapes,
+     * as shapes are not added automatically into the list upon construction
+     * @param a     The shape object to be added to the list
+     */
+
     public static void addShape(Shape a){
-        if (cur == null){
-            head = a;
+        if (head == null){
+            Shape.head = a;
         }
-        if(cur!=null){
-            cur.next=a;
-            a.previous=cur;
+        if(getCur() !=null){
+            getCur().setNext(a);
+            a.setPrevious(getCur());
         }
-        cur = a;
+        setCur(a);
         
     }
 
+    /**
+     * Static method getCur:
+     * @return  the cur pointer, which usually points to the latest available constructed shape
+     */
+    public static Shape getCur() {
+        return cur;
+    }
+
+    /**
+     * Static method setCur
+     * @param cur   Updating the cur pointer, when there are operations on the shape such that they are deleted or added
+     */
+    public static void setCur(Shape cur) {
+        Shape.cur = cur;
+    }
+
+    /**                 Basic Settings              **/
+
+
+    /**
+     * method getName:
+     * called directly by any instance of shape
+     * @return  the name of the shape
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * method getInfo:
+     * This method is overridden in every subclass, prints out the information of the shape (Type, name, x,y, etc.)
+     * @param n indicates the indentation, should be 1 for most cases, as the overridden version in group shape would do recursion on it, increasing the indentation value on printing the group members
+     */
     public void getInfo(int n){}
 
+    /**
+     * method getNext:
+     * @return  The shape pointed by the "next" pointer of the current shape
+     */
+    public Shape getNext() {
+        return next;
+    }
+
+    /**
+     * method setNext:
+     * @param next   Updates the "next" pointer of the current shape
+     */
+    public void setNext(Shape next) {
+        this.next = next;
+    }
+
+    /**
+     * method getPrevious:
+     * @return The shape pointed by the "previous" pointer of the current shape
+     */
+    public Shape getPrevious() {
+        return previous;
+    }
+
+    /**
+     * method setPrevious:
+     * @param previous updates the "previous" pointer of the current shape
+     */
+    public void setPrevious(Shape previous) {
+        this.previous = previous;
+    }
+
+    /**
+     * method getGrouparent:
+     * The grouparent pointer indicates if the current shape belongs to a group, if it does it will point to the group shape that grouped them, else the grouparent is set to null
+     * @return the group parent shape of the current shape, null if the current shape doesn't belong to a group
+     */
+    public Shape getGrouparent() {
+        return grouparent;
+    }
+
+    /**
+     * method setGrouparent:
+     * @param grouparent updates the group parent pointer of the current shape, when the current shape is involved grouping related operations such as group constructing and ungrouping
+     */
+    public void setGrouparent(Shape grouparent) {
+        this.grouparent = grouparent;
+    }
+
+    /**
+     * method move:
+     * "moves" the shape by adding the parameters passed into the method to the x and y coordinates of the shape respectively
+     * This method is overridden in every subclass of shape as the moving operation of each type of shape may slightly alter from each other
+     * In group, the method is recursed into the grouped shapes so every group member element is moved
+     * @param x     Moves the x-coordinate by this value (add it to x)
+     * @param y     Moves the y-coordinate by this value (add it to y)
+     */
     public void move(double x, double y){}
 
+    /**
+     * method boundingbox:
+     * This method is overridden in every subclass of shape, as the way to obtain the boundingbox of each shape is different from others
+     * Recursed in group shapes, as it will obtain the bounding boxes returned by each group member shape and compare them to find the bounding box that includes all shapes in the group
+     * @return      a double type array, in the indexes: 0 is the x, 1 is the y, 2 is the width, 3 is the height of the bounding box
+     */
     public double[] boundingbox(){
         return new double[4];
     }
 
+    /**
+     * method ungroup:
+     * The method is overridden in Group type subclass, it removes the group shape from the doubly linked list
+     * and set all the member shape's grouparent pointer to null as they are ungrouped
+     */
     public void ungroup(){}
 
+    /**
+     * method regroup:
+     * The method is overridden in Group type subclass, it "redo"s the ungroup operation by recovering the group
+     * and the member shape's grouparent pointer will point to the group again
+     */
     public void regroup(){}
 
+    /**
+     * static method findAShape:
+     * Takes a name as a parameter, returns the shape with the name if it exists in the doubly linked list
+     * @param name      The name of the shape to find
+     * @return          returns the shape object with the name, null if there is no such shape with the name
+     */
     public static Shape findAShape(String name) {        //finds and returns the shape with a name
-        Shape temp = cur;
+        Shape temp = getCur();
         while (temp != null) {
-            if (temp.name.equals(name)) {
+            if (temp.getName().equals(name)) {
                 break;
             }
-            temp = temp.previous;
+            temp = temp.getPrevious();
         }
         return temp;
     }
 
+    /**
+     * method belongToGroup:
+     * @return The grouparent pointer of the shape called this method
+     */
     public Shape belongToGroup(){
-        return grouparent;
+        return getGrouparent();
     }
     /**-----------------[Intersect related methods]------------------------------------------------------------**/
     /* public static boolean intersect(Shape n1, Shape n2){
@@ -84,10 +213,16 @@ public class Shape {
     }*/
     /**-----------------[Delete related methods]------------------------------------------------------------**/
 
+    /**
+     * static method delete
+     * takes a name as the parameter, finds and deletes the shape if the shape exists in the doubly linked list and not a member of a group.
+     * @param name  The name of the shape to be deleted
+     * @return      nothing
+     */
     public static boolean delete(String name){     //delete function prototype part 1
         Shape target = findAShape(name);
         if(target != null) {
-            if(target.grouparent == null) {
+            if(target.getGrouparent() == null) {
                 target.delete();
                 return false;
             }
@@ -102,29 +237,38 @@ public class Shape {
         }
     }
 
-    public void delete() {      //delete function prototype part 2 (v2)
+    /**
+     * method delete:
+     * deletes the shape that called this method
+     */
+    public void delete() {      //delete function prototype part 2
         SaveUndo(this,1);
-        if (this.previous == null && this.next != null) {
-            this.next.previous = null;
-        } else if (this.next == null && this.previous != null) {
-            cur = this.previous;
-        } else if (this.previous != null) {
-            this.next.previous = this.previous;
+        if (this.getPrevious() == null && this.getNext() != null) {
+            this.getNext().setPrevious(null);
+        } else if (this.getNext() == null && this.getPrevious() != null) {
+            setCur(this.getPrevious());
+        } else if (this.getPrevious() != null) {
+            this.getNext().setPrevious(this.getPrevious());
         } else {
-            cur = null;
+            setCur(null);
         }
-        if(cur == this){
-            cur = this.previous;
+        if(getCur() == this){
+            setCur(this.getPrevious());
         }
     }
+
+    /**
+     * method undelete:
+     * "undo"s the delete on a shape that is deleted
+     */
     public void undelete() {
         SaveUndo(this,2);
-        if (cur == null) {
-            cur = this;
-        }   else if (this.previous == null && this.next != null) {
-            this.next.previous = this;
+        if (getCur() == null) {
+            setCur(this);
+        }   else if (this.getPrevious() == null && this.getNext() != null) {
+            this.getNext().setPrevious(this);
         } else {
-            cur = this;
+            setCur(this);
         }
     }
 
@@ -132,31 +276,42 @@ public class Shape {
 
     /**---------------[List related methods]------------------------------------------------------------**/
 
-    public static void ListTest(){      //Lists every single shape, from the newest to the oldest
-        Shape temp = cur;
+    /**
+     * static method List
+     * Lists every available shape by the decreasing Z-order,
+     * by looping through the doubly linked list from cur(usually the tail) to head
+     * and calling getInfo on each shape
+     * group member shapes will not be listed out twice
+     */
+    public static void List(){      //Lists every single shape, from the newest to the oldest
+        Shape temp = getCur();
         while(temp != null){
             if(temp.belongToGroup() == null) {
                 temp.getInfo(1);
             }
-            temp = temp.previous;
+            temp = temp.getPrevious();
         }
     }
+
+    /**
+     * A Method made for debugging
+     */
     public static void ListFromHead(){   //might have to use this in redo steps, if you are having questions please ask Leo
         Shape temp = head;
         while (temp != null){
             temp.getInfo(1);
-            temp = temp.next;
+            temp = temp.getNext();
         }
     }
     /**---------------[Undo related methods]------------------------------------------------------------*/
-    static Stack<Shape> undo = new Stack<Shape>();
-    static Stack<Integer> code = new Stack<Integer>();
-    static Stack<Double> movx = new Stack<Double>();
-    static Stack<Double> movy = new Stack<Double>();
-    static Stack<Shape> redo = new Stack<Shape>();
-    static Stack<Integer> recode = new Stack<Integer>();
-    static Stack<Double> removx = new Stack<Double>();
-    static Stack<Double> removy = new Stack<Double>();
+    protected static Stack<Shape> undo = new Stack<Shape>();
+    protected static Stack<Integer> code = new Stack<Integer>();
+    protected static Stack<Double> movx = new Stack<Double>();
+    protected static Stack<Double> movy = new Stack<Double>();
+    protected static Stack<Shape> redo = new Stack<Shape>();
+    protected static Stack<Integer> recode = new Stack<Integer>();
+    protected static Stack<Double> removx = new Stack<Double>();
+    protected static Stack<Double> removy = new Stack<Double>();
     /**undoable methods:
      * re-add/delete 1,2
      * move 3
@@ -246,15 +401,42 @@ public class Shape {
         }
             
     }
+
+
 }
 
 
 //===============[RECTANGLE CLASS]==========================================================================
 
-
+/**
+ * Rectangle class shape, extended from Shape class
+ */
 class Rectangle extends Shape {
-    public double x, y, w, h;
+    /**
+     * The 4 parameters needed for constructing a rectangle
+     */
+    protected double x;
+    /**
+     *
+     */
+    protected double y;
+    /**
+     *
+     */
+    protected double w;
+    /**
+     *
+     */
+    protected double h;
 
+    /**
+     *
+     * @param name      The name of the rectangle
+     * @param x         The x-coordinate of the top-left corner of the rectangle
+     * @param y         The y-coordinate of the top-left corner of the rectangle
+     * @param w         The width of the rectangle
+     * @param h         The height of the rectangle
+     */
     Rectangle(String name, double x, double y, double w, double h) {
         super(name);
         SaveUndo(this,2);
@@ -290,9 +472,36 @@ class Rectangle extends Shape {
 
 //===============[LINE CLASS]======================================================================================
 
+/**
+ * Line class shape, extended from Shape class
+ */
 
 class Line extends Shape {
-    public double x1, y1, x2, y2;
+    /**
+     * The variables of a line, 2 sets of x,y coordinates to indicate the two points that forms a line
+     */
+    protected double x1;
+    /**
+     *
+     */
+    protected double y1;
+    /**
+     *
+     */
+    protected double x2;
+    /**
+     *
+     */
+    protected double y2;
+
+    /**
+     *
+     * @param name      The name of the line shape
+     * @param x1        The x-coordinate of the first point
+     * @param y1        The y-coordinate of the first point
+     * @param x2        The x-coordinate of the second point
+     * @param y2        The y-coordinate of the second point
+     */
 
     Line(String name, double x1, double y1, double x2, double y2) {
         super(name);
@@ -333,8 +542,34 @@ class Line extends Shape {
 //======================[CIRCLE CLASS]=============================================================================
 
 
+/**
+ *
+ * Circle class Shape, extended from class Shape
+ *
+ */
+
 class  Circle extends Shape {
-    public double x, y, r;
+
+    /**
+     * The 3 parameters necessary for a circle
+     */
+    protected double x;
+    /**
+     *
+     */
+    protected double y;
+    /**
+     *
+     */
+    protected double r;
+
+    /**
+     *
+     * @param name      The name of the shape
+     * @param x         The x-coordinate of the circle's centre
+     * @param y         The y-coordinate of the circle's centre
+     * @param r         The radius of the circle
+     */
 
     Circle(String name, double x, double y, double r) {
         super(name);
@@ -370,9 +605,30 @@ class  Circle extends Shape {
 
 //==================[SQUARE CLASS]=================================================================================
 
-
+/**
+ * Square class shape, extended from class Shape
+ */
 class Square extends Shape {
-    public double x, y, l;
+    /**
+     * The 3 parameters needed for a square
+     */
+    protected double x;
+    /**
+     *
+     */
+    protected double y;
+    /**
+     *
+     */
+    protected double l;
+
+    /**
+     *
+     * @param name      The name of the shape
+     * @param x         The x-coordinate of the square's top left corner
+     * @param y         The y-coordinate of the square's top left corner
+     * @param l         The side length of the square
+     */
 
     Square(String name, double x, double y, double l) {
         super(name);
@@ -407,15 +663,30 @@ class Square extends Shape {
 
 //==================[GROUP CLASS]=====================================================================
 
+/**
+ * Group class, it is not exactly a shape itself
+ * This class exists to facilitate the grouping of the normal shapes,
+ * and the functions to be passed/recursed on the grouped shapes (e.g. moving a whole group of shapes)
+ */
+
 class Group extends Shape {
-    public Shape[] s1;
+    /**
+     * The array to point to all existing children shapes that are commanded to be grouped together
+     */
+    protected Shape[] s1;
+
+    /**
+     *
+     * @param name      The name of the group
+     * @param s1        The array of Shapes that are supposed to be grouped
+     */
 
     Group(String name, Shape[] s1) {
         super(name);
         SaveUndo(this,5);
         this.s1 = s1;
         for (int i=0; i<s1.length; i++){
-            this.s1[i].grouparent = this;
+            this.s1[i].setGrouparent(this);
         }
     }
 
@@ -484,7 +755,7 @@ class Group extends Shape {
     @Override
     public void delete() {
         SaveUndo(this,1);
-        if (this.grouparent == null) {
+        if (this.getGrouparent() == null) {
             gdelete();
         } else {
             System.out.println("Deleting a component shape of a group is invalid!");
@@ -506,35 +777,35 @@ class Group extends Shape {
     public void ungroup() {
         SaveUndo(this, 4);
         for (int i=0; i<s1.length; i++){
-            s1[i].grouparent = null;
+            s1[i].setGrouparent(null);
         }
         gdelete();
     }
 
     private void gdelete() {
-        if (this.previous == null && this.next != null) {
-            this.next.previous = null;
-        } else if (this.next == null && this.previous != null) {
-            cur = this.previous;
-        } else if (this.previous != null) {
-            this.next.previous = this.previous;
+        if (this.getPrevious() == null && this.getNext() != null) {
+            this.getNext().setPrevious(null);
+        } else if (this.getNext() == null && this.getPrevious() != null) {
+            setCur(this.getPrevious());
+        } else if (this.getPrevious() != null) {
+            this.getNext().setPrevious(this.getPrevious());
         } else {
-            cur = null;
+            setCur(null);
         }
-        if (cur == this) {
-            cur = this.previous;
+        if (getCur() == this) {
+            setCur(this.getPrevious());
         }
     }
 
     @Override
     public void undelete() {
         SaveUndo(this,2);
-        if (cur == null) {
-            cur = this;
-        }   else if (this.previous == null && this.next != null) {
-            this.next.previous = this;
+        if (getCur() == null) {
+            setCur(this);
+        }   else if (this.getPrevious() == null && this.getNext() != null) {
+            this.getNext().setPrevious(this);
         } else {
-            cur = this;
+            setCur(this);
         }
     }
 
@@ -544,7 +815,7 @@ class Group extends Shape {
         undelete();
         PopUndo();
         for (int i=0; i<s1.length; i++){
-            this.s1[i].grouparent = this;
+            this.s1[i].setGrouparent(this);
         }
     }
 

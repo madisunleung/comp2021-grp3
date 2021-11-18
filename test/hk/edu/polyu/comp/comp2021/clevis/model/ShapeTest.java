@@ -1,6 +1,5 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -77,9 +76,9 @@ class ShapeTest {
         Shape.addShape(rec1);
         Shape.addShape(line1);
         Shape.addShape(grp);
-        Shape.ListTest();
+        Shape.List();
         grp.ungroup();
-        Shape.ListTest();         //The group should not be there now
+        Shape.List();         //The group should not be there now
     }
 
     @Test
@@ -89,11 +88,11 @@ class ShapeTest {
         Shape.addShape(rec1);
         Shape.addShape(line1);
         Shape.addShape(grp);
-        Shape.ListTest();
+        Shape.List();
         grp.ungroup();
-        Shape.ListTest();
+        Shape.List();
         grp.regroup();
-        Shape.ListTest();         //Lost and found
+        Shape.List();         //Lost and found
 
     }
 
@@ -141,7 +140,7 @@ class ShapeTest {
         Shape.addShape(rec1);
         Shape.addShape(line1);
         Shape.addShape(grp);
-        Shape.ListTest();         //Should see a group containing all shapes
+        Shape.List();         //Should see a group containing all shapes
     }
 
     @Test
@@ -154,7 +153,7 @@ class ShapeTest {
         Shape.ListFromHead();         //The method to facilitate our undo,redo requirements
         grp.ungroup();
         Shape.delete("squr1");
-        Shape.ListTest();             //Now the group and squr1 is removed from the list as you view it normally
+        Shape.List();             //Now the group and squr1 is removed from the list as you view it normally
         Shape.ListFromHead();         //But as you do this, all the shapes are still there in their correct orders.
     }
 

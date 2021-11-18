@@ -15,43 +15,67 @@ import java.io.*;
 public class Clevis {
 
     /**
-     *
-     * @param hname The name of the html file
-     * @param tname The name of the txt file
-     * @throws IOException Exception thrown for Input output issues in writing the files
+     * Scanner for reading inputs from the user
      */
+    protected Scanner input = new Scanner(System.in);
+    /**
+     * Array list for storing all the valid commands
+     * for writing them into log files when the program is called to terminate
+     */
+    protected ArrayList<String> cmds = new ArrayList<String>();
+    /**
+     * boolean variable to check if the current command is valid or not
+     */
+    protected boolean invalid;
+    /**
+     * String to receive the input from the user
+     */
+    protected String sinput;
+    /**
+     * regex sequence to recognize numeric values
+     */
+    protected String fregex = "(-[0-9]+[.][0-9]+|-[0-9]+|[0-9]+[.][0-9]+|[0-9]+)";
+    /**
+     * regex sequence to recognize name parameters in a command
+     */
+    protected String nregex = "([a-zA-z0-9]+)";
 
-    Scanner input = new Scanner(System.in);
-    ArrayList<String> cmds = new ArrayList<String>();
-    boolean invalid;
-    String sinput;
-    String fregex = "(-[0-9]+[.][0-9]+|-[0-9]+|[0-9]+[.][0-9]+|[0-9]+)";
-    String nregex = "([a-zA-z0-9]+)";
+    /**
+     * Clevis, keeps looping to read user input and do the commands until quit is called
+     * @param hname     The name of the html log file
+     * @param tname     The name of the txt log file
+     * @throws IOException      Exception when there are issues with input/outputs
+     */
 
     public Clevis(String hname, String tname) throws IOException {
         System.out.println("Welcome to CLEVIS!\n" +
                 "Made by group 3\n");
         boolean cont = true;
-        do{
+        do {
             cont = CLI();
-        }while(cont);
+        } while (cont);
         File folder = new File("outputs");
         folder.mkdir();
 
         System.out.println("Creating logs...");
-        File txt = new File("outputs\\"+tname);
-        File html = new File("outputs\\"+hname);
+        File txt = new File("outputs\\" + tname);
+        File html = new File("outputs\\" + hname);
         BufferedWriter tw = new BufferedWriter(new FileWriter(txt));
         BufferedWriter hw = new BufferedWriter(new FileWriter(html));
-        for(int i = 0; i < cmds.size();i++){
-            tw.write(cmds.get(i)+"\n");
-            hw.write(i+1+"\t\t"+cmds.get(i)+"<br>");
+        for (int i = 0; i < cmds.size(); i++) {
+            tw.write(cmds.get(i) + "\n");
+            hw.write(i + 1 + "\t\t" + cmds.get(i) + "<br>");
         }
         tw.close();
         hw.close();
     }
 
-    public boolean CLI() {            //Test comment message, hope you see this
+    /**
+     * The CLI to read user input, check if the command is valid, and calls corresponding methods to perform actions
+     * @return     a boolean, that indicates if the program will continue(true) or teminate(false)
+     */
+
+    public boolean CLI() {
 
         invalid = false;
         System.out.print("Please enter your command: ");
@@ -84,7 +108,7 @@ public class Clevis {
             invalid = list(sinput);
         } else if (sinput.equals("listAll")) {                                                           //List all the shape, basically complete
             System.out.println("listAll command recognized");
-            Shape.ListTest();
+            Shape.List();
         } else if (sinput.equals("quit")) {                                                             //Quit the CLI, no need to check this right?
             System.out.println("Quitting...");
         } else if (sinput.equals("listHead")) {
@@ -112,19 +136,30 @@ public class Clevis {
 
     }
 
-    public boolean recConstruct(String sinput){
+    /**
+     * method recConstruct:
+     * Checks if the command is valid, if yes then a rectangle is created according to the parameters and added to the doubly linked list
+     * @param sinput      The user input
+     * @return              A boolean indicating the command is checked to be invalid(True) or not(False)
+     */
+    public boolean recConstruct(String sinput) {
         System.out.println("Rectangle command recognized");
         String[] cmd = sinput.split(" ");
         if (nameNotUsed(cmd[1])) {
             Shape.addShape(new Rectangle(cmd[1], Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), Double.parseDouble(cmd[4]), Double.parseDouble(cmd[5])));
             Shape.ClearRedo();
             return false;
-        }
-        else{
+        } else {
             return true;
         }
     }
 
+    /**
+     * method lineConstruct:
+     * Checks if the command is valid, if yes then a line is created according to the parameters and added to the doubly linked list
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is checked to be invalid(True) or not(False)
+     */
     public boolean lineConstruct(String sinput){
         System.out.println("line command recognized");
         String[] cmd = sinput.split(" ");
@@ -138,6 +173,12 @@ public class Clevis {
         }
     }
 
+    /**
+     * method cirConstruct:
+     * Checks if the command is valid, if yes then a circle is created according to the parameters and added to the doubly linked list
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is checked to be invalid(True) or not(False)
+     */
     public boolean cirConstruct(String sinput){
         System.out.println("circle command recognized");
         String[] cmd = sinput.split(" ");
@@ -150,6 +191,13 @@ public class Clevis {
             return true;
         }
     }
+
+    /**
+     * method squConstruct:
+     * Checks if the command is valid, if yes then a square is created according to the parameters and added to the doubly linked list
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is checked to be invalid(True) or not(False)
+     */
     public boolean squConstruct(String sinput){
         System.out.println("square command recognized");
         String[] cmd = sinput.split(" ");
@@ -163,6 +211,13 @@ public class Clevis {
         }
     }
 
+    /**
+     * method grpConstruct:
+     * Checks if the command is valid, if yes then a group is created according to the parameters and added to the doubly linked list
+     * The grouped shapes are also going to have their grouparent pointer set pointing to this group instance created
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     */
     public boolean grpConstruct(String sinput){
         String[] cmd = sinput.split(" ");
         String cmdregex = "group";
@@ -179,7 +234,7 @@ public class Clevis {
             }
             if (nameNotUsed(cmd[1])) {
                 for(int i=2; i<cmd.length; i++){
-                    if(a[i-2] == null || a[i - 2].grouparent != null){
+                    if(a[i-2] == null || a[i - 2].getGrouparent() != null){
                         return true;
                     }
                 }
@@ -196,6 +251,12 @@ public class Clevis {
         return true;
     }
 
+    /**
+     * method ungrp:
+     * Check if the command is valid, if yes, then the group with the name stated in the command will be ungrouped
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     * */
     public boolean ungrp(String sinput){
         System.out.println("ungroup command recognized");
         String[] cmd = sinput.split(" ");
@@ -204,7 +265,7 @@ public class Clevis {
             System.out.println("This is not a group.");
             return true;
         }
-        else if(temp != null && temp.grouparent == null) {
+        else if(temp != null && temp.getGrouparent() == null) {
             temp.ungroup();
             Shape.ClearRedo();
             return false;
@@ -212,6 +273,12 @@ public class Clevis {
         return true;
     }
 
+    /**
+     * method del:
+     * Calls delete on the shape with the name indicated in the command, if the shape is not found/ it belongs to a group, the command is invalid
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     */
     public boolean del(String sinput){
         System.out.println("delete command recognized");
         String[] cmd = sinput.split(" ");
@@ -219,13 +286,19 @@ public class Clevis {
         return Shape.delete(cmd[1]);
     }
 
+    /**
+     * method boundingbox:
+     * Check if the actions is valid, yes then returns the information about the bounding box that includes all shapes in it
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     */
     public boolean boundingbox(String sinput){
         System.out.println("boundingbox command recognized");
         String[] cmd = sinput.split(" ");
         Shape temp = Shape.findAShape(cmd[1]);
-        if(temp != null && temp.grouparent == null) {
+        if(temp != null && temp.getGrouparent() == null) {
             double[] result =temp.boundingbox();
-            System.out.println("Bounding box of "+cmd[1]+" is: x: "+String.format("%.2f",result[0])+" y: "+String.format("%.2f",result[1])+" w: "+String.format("%.2f",result[2])+" h: "+String.format("%.2f",result[3]));
+            System.out.println("Bounding box of "+cmd[1]+" is: [x: "+String.format("%.2f",result[0])+"]  [y: "+String.format("%.2f",result[1])+"]  [w: "+String.format("%.2f",result[2])+"]  [h: "+String.format("%.2f",result[3])+"]");
             return false;
         } else if(temp == null){
             System.out.println("No shape with such name is found.");
@@ -236,11 +309,18 @@ public class Clevis {
         }
     }
 
+
+    /**
+     * method move:
+     * Check if the action is valid, yes then calls the shape to move by the passed in parameters
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     */
     public boolean move(String sinput){
         System.out.println("move command recognized");
         String[] cmd = sinput.split(" ");
         Shape temp =  Shape.findAShape(cmd[1]);
-        if(temp != null && temp.grouparent == null){
+        if(temp != null && temp.getGrouparent() == null){
             temp.move(Double.parseDouble(cmd[2]),Double.parseDouble(cmd[3]));
             Shape.ClearRedo();
             return false;
@@ -254,11 +334,17 @@ public class Clevis {
         }
     }
 
+    /**
+     * method list:
+     * Checks if the action is valid, yes then calls getInfo on the shape indicated in the command to show the information the shape contains
+     * @param sinput        The user input
+     * @return              A boolean indicating the command is check to be invalid(True) or not(False)
+     */
     public boolean list(String sinput){
         System.out.println("list command recognized");
         String[] cmd = sinput.split(" ");
         Shape temp = Shape.findAShape(cmd[1]);
-        if(temp != null && temp.grouparent == null){
+        if(temp != null && temp.getGrouparent() == null){
             temp.getInfo(1);
             return false;
         }
@@ -275,7 +361,7 @@ public class Clevis {
 
 
     /**
-     *
+     * method nameNotUsed:
      * @param name  Finds a shape with that name, to see if it is used
      * @return      give false when the name is used by a shape in the list, else true
      */

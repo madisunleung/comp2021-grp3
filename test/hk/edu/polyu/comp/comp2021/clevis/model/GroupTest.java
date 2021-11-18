@@ -43,8 +43,8 @@ class GroupTest {
         Shape.addShape(line1);
         Shape.addShape(rec1);
         Shape.addShape(grp);
-        Shape.ListTest();
+        Shape.List();
         grp.ungroup();
-        Shape.ListTest();
+        Shape.List();
     }
 }
