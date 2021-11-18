@@ -482,7 +482,7 @@ public class Shape {
      * @return          an array of shapes inside that group of shapes
      */
     public static ArrayList<Shape> subShapes(Shape n){
-        Shape temp = cur;
+        Shape temp = getCur();
         ArrayList<Shape> ret = new ArrayList<>();
         if (n.getSubClass().equals("Group")){
             while (temp != null) {
@@ -514,7 +514,7 @@ public class Shape {
      * @param dy        the change in y coordinate of the shape
      */
     public static void pickandmove(double x, double y, double dx, double dy){
-        Shape temp = cur;
+        Shape temp = getCur();
         while (temp != null) {
             if (containspoint(temp, x, y)) {
                 break;
